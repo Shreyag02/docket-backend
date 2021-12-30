@@ -1,6 +1,5 @@
-const { User } = require("../../models");
+const { users } = require("../../models");
 const { genSaltSync, hashSync } = require("bcrypt");
-const { v4: uuidv4 } = require("uuid");
 
 const successResponse = (req, res, data, code = 200) =>
   res.send({
@@ -29,11 +28,11 @@ const salt = genSaltSync(5);
 module.exports = {
   register: async (req, res) => {
     try {
-      let { email, password, firstName, lastName } = req.body;
+      let { email, password, first_name, last_name } = req.body;
       console.log(req.body);
       password = hashSync(password, salt);
 
-      const user = await User.findOne({
+      const user = await users.findOne({
         where: { email },
       });
       if (user) {
@@ -46,15 +45,14 @@ module.exports = {
       }
 
       const payload = {
-        id: uuidv4(),
         email,
-        firstName,
-        lastName,
+        first_name,
+        last_name,
         password,
       };
       console.log(payload);
 
-      User.create(payload);
+      await users.create(payload);
       return successResponse(req, res, {});
     } catch (error) {
       console.log(error);
@@ -65,7 +63,7 @@ module.exports = {
 
   login: async (req, res) => {
     try {
-      const user = await User.findOne({
+      const user = await users.findOne({
         where: { email: req.body.email },
       });
       if (!user) {
@@ -77,7 +75,7 @@ module.exports = {
         return errorResponse(req, res, "Incorrect Password", 403);
       }
 
-      return successResponse(req, res, user.firstName + user.lastName);
+      return successResponse(req, res, user.first_name + user.last_name);
     } catch (error) {
       return errorResponse(req, res, error.message);
     }

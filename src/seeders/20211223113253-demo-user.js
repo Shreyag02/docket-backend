@@ -14,11 +14,11 @@ module.exports = {
    * }], {});
    */
   up: (queryInterface, Sequelize) => {
-    return queryInterface.bulkInsert("Users", [
+    return queryInterface.bulkInsert("users", [
       {
         id: uuidv4(),
-        firstName: "John",
-        lastName: "Doe",
+        first_name: "John",
+        last_name: "Doe",
         email: "example@example.com",
         password: hashSync("test@1234", salt),
         createdAt: new Date(),
@@ -36,6 +36,6 @@ module.exports = {
   //    */
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete("Users", null, {});
+    return queryInterface.bulkDelete("users", null, {});
   },
 };

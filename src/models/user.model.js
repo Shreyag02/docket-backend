@@ -1,9 +1,9 @@
 "use strict";
 const { Model } = require("sequelize");
-// const { v4: uuidv4 } = require("uuid");
+const { v4: uuidv4 } = require("uuid");
 
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class users extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,40 +13,26 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  User.init(
+  users.init(
     {
       id: {
-        allowNull: false,
         primaryKey: true,
         type: DataTypes.UUID,
-        validate: {
-          notNull: true,
-        },
       },
-
-      firstName: DataTypes.STRING,
-      lastName: DataTypes.STRING,
+      first_name: DataTypes.STRING,
+      last_name: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
     },
     {
-      // hooks: {
-      //   beforeCreate: (user, _) => {
-      //     console.log(user.id);
-      //     user.id = uuidv4();
-      //     console.log("after", user.id);
-      //   },
-      // },
+      hooks: {
+        beforeCreate: (user, _) => {
+          user.id = uuidv4();
+        },
+      },
       sequelize,
-      modelName: "User",
+      modelName: "users",
     }
-    // {
-    //   sequelize,
-    //   modelName: "User",
-    // }
   );
-  // User.beforeCreate((user, _) => {
-  //   return (user.id = uuidv4());
-  // });
-  return User;
+  return users;
 };
