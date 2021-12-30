@@ -1,6 +1,5 @@
 const { User } = require("../../models");
 const { genSaltSync, hashSync } = require("bcrypt");
-const { v4: uuidv4 } = require("uuid");
 
 const successResponse = (req, res, data, code = 200) =>
   res.send({
@@ -46,7 +45,6 @@ module.exports = {
       }
 
       const payload = {
-        id: uuidv4(),
         email,
         firstName,
         lastName,
@@ -54,7 +52,7 @@ module.exports = {
       };
       console.log(payload);
 
-      User.create(payload);
+      await User.create(payload);
       return successResponse(req, res, {});
     } catch (error) {
       console.log(error);
