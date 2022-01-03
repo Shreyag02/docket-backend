@@ -1,9 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
-const { v4: uuidv4 } = require("uuid");
-
 module.exports = (sequelize, DataTypes) => {
-  class users extends Model {
+  class Token extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,26 +11,24 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  users.init(
+  Token.init(
     {
-      id: {
+      accessToken: {
         primaryKey: true,
-        type: DataTypes.UUID,
+        type: DataTypes.STRING,
       },
-      first_name: DataTypes.STRING,
-      last_name: DataTypes.STRING,
-      email: DataTypes.STRING,
-      password: DataTypes.STRING,
+      expiresIn: DataTypes.DATE,
+      refreshToken: DataTypes.STRING,
+      scope: DataTypes.STRING,
+      tokenType: DataTypes.STRING,
+      clientId: DataTypes.STRING,
+      userId: DataTypes.UUID,
     },
     {
-      hooks: {
-        beforeCreate: (user, _) => {
-          user.id = uuidv4();
-        },
-      },
       sequelize,
-      modelName: "users",
+      modelName: "Token",
+      underscored: true,
     }
   );
-  return users;
+  return Token;
 };

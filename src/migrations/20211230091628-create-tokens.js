@@ -1,30 +1,35 @@
 "use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("users", {
-      id: {
+    await queryInterface.createTable("tokens", {
+      accessToken: {
         allowNull: false,
-        type: Sequelize.UUID,
+        type: Sequelize.STRING,
         primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
+        field: "access_token",
       },
-      firstName: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        field: "first_name",
+      expiresIn: {
+        type: Sequelize.DATE,
+        field: "expires_in",
       },
-      lastName: {
+      refreshToken: {
         type: Sequelize.STRING,
-        allowNull: false,
-        field: "last_name",
+        field: "refresh_token",
       },
-      email: {
+      scope: {
         type: Sequelize.STRING,
-        allowNull: false,
       },
-      password: {
+      tokenType: {
         type: Sequelize.STRING,
-        allowNull: false,
+        field: "token_type",
+      },
+      clientId: {
+        type: Sequelize.STRING,
+        field: "client_id",
+      },
+      userId: {
+        type: Sequelize.UUID,
+        field: "user_id",
       },
       createdAt: {
         allowNull: false,
@@ -44,6 +49,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("users");
+    await queryInterface.dropTable("tokens");
   },
 };

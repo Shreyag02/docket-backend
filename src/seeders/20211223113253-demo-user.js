@@ -21,9 +21,9 @@ module.exports = {
         last_name: "Doe",
         email: "example@example.com",
         password: hashSync("test@1234", salt),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        archivedAt: null,
+        created_at: new Date(),
+        updated_at: new Date(),
+        archived_at: null,
       },
     ]);
   },
@@ -36,6 +36,6 @@ module.exports = {
   //    */
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete("users", null, {});
+    return queryInterface.bulkDelete("Users", null, {});
   },
 };
