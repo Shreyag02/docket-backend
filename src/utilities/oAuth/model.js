@@ -1,5 +1,5 @@
-const crypto = require("crypto");
 const { Client, AuthorizationCode, Token } = require("../../models");
+const { encryptData } = require("../helper");
 
 const db = {
   authorizationCode: AuthorizationCode,
@@ -7,185 +7,94 @@ const db = {
   token: Token,
 };
 
-const DebugControl = require("../debug");
+const VALID_SCOPES = ["read", "write"];
 
 module.exports = {
-  getClient: function (clientId, clientSecret) {
-    // query db for details with client
-    log({
-      title: "Get Client",
-      parameters: [
-        { name: "clientId", value: clientId },
-        { name: "clientSecret", value: clientSecret },
-      ],
+  getClient: async (clientId, clientSecret) => {
+    console.log("getclient");
+    const client = await db.client.findOne({
+      where: { clientId },
     });
-    db.client = {
-      // Retrieved from the database
-      clientId: clientId,
-      clientSecret: clientSecret,
-      grants: ["refresh_token", "password"],
-      // redirectUris: ["http://localhost:3030/client/app"],
-    };
-    return new Promise((resolve) => {
-      resolve(db.client);
+    console.log({
+      id: client.clientId,
+      redirectUris: client.dataUris,
+      grants: client.grants,
     });
+    if (client && client.clientSecret == clientSecret) {
+      return {
+        id: client.clientId,
+        redirectUris: client.dataUris,
+        grants: client.grants,
+      };
+    }
   },
-  // generateAccessToken: (client, user, scope) => { // generates access tokens
-  //   log({
-  //     title: 'Generate Access Token',
-  //     parameters: [
-  //       {name: 'client', value: client},
-  //       {name: 'user', value: user},
-  //     ],
-  //   })
-  //
-  // },
-  saveToken: (token, client, user) => {
-    /* This is where you insert the token into the database */
-    log({
-      title: "Save Token",
-      parameters: [
-        { name: "token", value: token },
-        { name: "client", value: client },
-        { name: "user", value: user },
-      ],
+  getUser: (username, password) => {
+    console.log("getuser");
+
+    const user = db.user.findOne({
+      where: { email: username },
     });
-    db.token = {
+    console.log({ username: user.email, password: user.password });
+
+    if (user && user.password == encryptData(password)) {
+      return { username: user.email, password: user.password };
+    }
+  },
+
+  saveToken: async (token, client, user) => {
+    console.log("savetoken");
+
+    const payload = {
+      accessToken: token.accessToken,
+      expiresIn: token.accessTokenExpiresAt,
+      refreshToken: token.refreshToken,
+      clientId: client.clientId,
+      userId: user.userId,
+      scope: token.scope,
+    };
+
+    console.log({
       accessToken: token.accessToken,
       accessTokenExpiresAt: token.accessTokenExpiresAt,
-      refreshToken: token.refreshToken, // NOTE this is only needed if you need refresh tokens down the line
-      refreshTokenExpiresAt: token.refreshTokenExpiresAt,
-      client: client,
-      user: user,
+      refreshToken: token.refreshToken,
+      scope: token.scope,
+      client: { id: client.clientId },
+      user: { id: user.userId },
+    });
+    await db.token.create(payload);
+    return {
+      accessToken: token.accessToken,
+      accessTokenExpiresAt: token.accessTokenExpiresAt,
+      refreshToken: token.refreshToken,
+      scope: token.scope,
+      client: { id: client.clientId },
+      user: { id: user.userId },
     };
-    return new Promise((resolve) => resolve(db.token));
+    // return new Promise(resolve => resolve(db.token))
   },
-  getAccessToken: (token) => {
-    /* This is where you select the token from the database where the code matches */
-    log({
-      title: "Get Access Token",
-      parameters: [{ name: "token", value: token }],
-    });
-    if (!token || token === "undefined") return false;
-    return new Promise((resolve) => resolve(db.token));
-  },
-  getRefreshToken: (token) => {
-    /* Retrieves the token from the database */
-    log({
-      title: "Get Refresh Token",
-      parameters: [{ name: "token", value: token }],
-    });
-    DebugControl.log.variable({ name: "db.token", value: db.token });
-    return new Promise((resolve) => resolve(db.token));
-  },
-  revokeToken: (token) => {
-    /* Delete the token from the database */
-    log({
-      title: "Revoke Token",
-      parameters: [{ name: "token", value: token }],
-    });
-    if (!token || token === "undefined") return false;
-    return new Promise((resolve) => resolve(true));
-  },
-  generateAuthorizationCode: (client, user, scope) => {
-    /* 
-    For this to work, you are going have to hack this a little bit:
-    1. navigate to the node_modules folder
-    2. find the oauth_server folder. (node_modules/express-oauth-server/node_modules/oauth2-server)
-    3. open lib/handlers/authorize-handler.js
-    4. Make the following change (around line 136):
-    AuthorizeHandler.prototype.generateAuthorizationCode = function (client, user, scope) {
-      if (this.model.generateAuthorizationCode) {
-        // Replace this
-        //return promisify(this.model.generateAuthorizationCode).call(this.model, client, user, scope);
-        // With this
-        return this.model.generateAuthorizationCode(client, user, scope)
-      }
-      return tokenUtil.generateRandomToken();
-    };
-    */
 
-    log({
-      title: "Generate Authorization Code",
-      parameters: [
-        { name: "client", value: client },
-        { name: "user", value: user },
-      ],
-    });
-
-    const seed = crypto.randomBytes(256);
-    const code = crypto.createHash("sha1").update(seed).digest("hex");
-    return code;
-  },
-  saveAuthorizationCode: (code, client, user) => {
-    /* This is where you store the access code data into the database */
-    log({
-      title: "Save Authorization Code",
-      parameters: [
-        { name: "code", value: code },
-        { name: "client", value: client },
-        { name: "user", value: user },
-      ],
-    });
-    db.authorizationCode = {
-      authorizationCode: code.authorizationCode,
-      expiresAt: code.expiresAt,
-      client: client,
-      user: user,
-    };
-    return new Promise((resolve) =>
-      resolve(
-        Object.assign(
-          {
-            redirectUri: `${code.redirectUri}`,
-          },
-          db.authorizationCode
-        )
-      )
-    );
-  },
-  getAuthorizationCode: (authorizationCode) => {
-    /* this is where we fetch the stored data from the code */
-    log({
-      title: "Get Authorization code",
-      parameters: [{ name: "authorizationCode", value: authorizationCode }],
-    });
-    return new Promise((resolve) => {
-      resolve(db.authorizationCode);
-    });
-  },
-  revokeAuthorizationCode: (authorizationCode) => {
-    /* This is where we delete codes */
-    log({
-      title: "Revoke Authorization Code",
-      parameters: [{ name: "authorizationCode", value: authorizationCode }],
-    });
-    db.authorizationCode = {
-      // DB Delete in this in memory example :)
-      authorizationCode: "", // A string that contains the code
-      expiresAt: new Date(), // A date when the code expires
-      redirectUri: "", // A string of where to redirect to with this code
-      client: null, // See the client section
-      user: null, // Whatever you want... This is where you can be flexible with the protocol
-    };
-    const codeWasFoundAndDeleted = true; // Return true if code found and deleted, false otherwise
-    return new Promise((resolve) => resolve(codeWasFoundAndDeleted));
-  },
-  verifyScope: (token, scope) => {
-    /* This is where we check to make sure the client has access to this scope */
-    log({
-      title: "Verify Scope",
-      parameters: [
-        { name: "token", value: token },
-        { name: "scope", value: scope },
-      ],
-    });
-    const userHasAccess = true; // return true if this user / client combo has access to this resource
-    return new Promise((resolve) => resolve(userHasAccess));
+  validateScope: (user, client, scope) => {
+    if (!scope.split(" ").every((s) => VALID_SCOPES.indexOf(s) >= 0)) {
+      return false;
+    }
+    return scope;
   },
 };
 
-function log({ title, parameters }) {
-  DebugControl.log.functionName(title);
-  DebugControl.log.parameters(parameters);
-}
+//password
+
+// generateAccessToken(client, user, scope, [callback]) default
+// generateRefreshToken(client, user, scope, [callback]) default
+
+// getClient(clientId, clientSecret, [callback])
+// getUser(username, password, [callback])
+
+// saveToken(token, client, user, [callback])
+// validateScope(user, client, scope, [callback])
+
+// {
+//   "clientId":"m8sYM0JWY1J0rIMDVE4kcNvPF0GeZcX8ND2ThcG7XFvUSEmd",
+//   "clientSecret":"GsRHF3cdw9DRQ0g3KLQXLK84Gx5CaduL9XuMHvWglfhKj2gD",
+//   "password": "Test@124",
+//   "email": "Test1@gmail.com"
+// }
