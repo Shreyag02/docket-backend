@@ -7,6 +7,7 @@ const {
   encryptData,
 } = require("../../utilities/helper");
 
+const bcrypt = require("bcrypt");
 module.exports = {
   register: async (req, res) => {
     try {
@@ -53,11 +54,11 @@ module.exports = {
       if (!user) {
         return errorResponse(req, res, "Incorrect Email Id", 403);
       }
-      const reqPass = encryptData(req.body.password);
 
-      if (reqPass !== user.password) {
-        return errorResponse(req, res, "Incorrect Password", 403);
-      }
+      bcrypt
+        .compare(req.body.password, user.password)
+        .then(() => console.log("true"))
+        .catch(() => errorResponse(req, res, "Incorrect Password", 403));
 
       return successResponse(req, res, user);
     } catch (error) {

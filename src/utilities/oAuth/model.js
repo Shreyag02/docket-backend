@@ -1,18 +1,12 @@
-const { Client, AuthorizationCode, Token } = require("../../models");
-const { encryptData } = require("../helper");
-
-const db = {
-  authorizationCode: AuthorizationCode,
-  client: Client,
-  token: Token,
-};
+const { Client, User, AuthorizationCode, Token } = require("../../models");
+const bcrypt = require("bcrypt");
 
 const VALID_SCOPES = ["read", "write"];
 
 module.exports = {
   getClient: async (clientId, clientSecret) => {
     console.log("getclient");
-    const client = await db.client.findOne({
+    const client = await Client.findOne({
       where: { clientId },
     });
     console.log({
@@ -20,7 +14,7 @@ module.exports = {
       redirectUris: client.dataUris,
       grants: client.grants,
     });
-    if (client && client.clientSecret == clientSecret) {
+    if (client && client.clientSecret === clientSecret) {
       return {
         id: client.clientId,
         redirectUris: client.dataUris,
@@ -28,16 +22,26 @@ module.exports = {
       };
     }
   },
-  getUser: (username, password) => {
+  getUser: async (username, password) => {
     console.log("getuser");
-
-    const user = db.user.findOne({
+    console.log({ username, password });
+    const user = await User.findOne({
       where: { email: username },
     });
-    console.log({ username: user.email, password: user.password });
+    let flag = false;
+    user &&
+      (await bcrypt
+        .compare(password, user.password)
+        .then(() => {
+          flag = true;
+        })
+        .catch(() => console.log("Incorrect Password")));
 
-    if (user && user.password == encryptData(password)) {
-      return { username: user.email, password: user.password };
+    if (flag) {
+      console.log("executed");
+      return { username: user.email, password: user.password, id: user.id };
+    } else {
+      console.log("not executed");
     }
   },
 
@@ -48,20 +52,22 @@ module.exports = {
       accessToken: token.accessToken,
       expiresIn: token.accessTokenExpiresAt,
       refreshToken: token.refreshToken,
-      clientId: client.clientId,
-      userId: user.userId,
+      clientId: client.id,
+      userId: user.id,
       scope: token.scope,
     };
+
+    console.log(client, user);
 
     console.log({
       accessToken: token.accessToken,
       accessTokenExpiresAt: token.accessTokenExpiresAt,
       refreshToken: token.refreshToken,
       scope: token.scope,
-      client: { id: client.clientId },
-      user: { id: user.userId },
+      client: { id: client.id },
+      user: { id: user.id },
     });
-    await db.token.create(payload);
+    await Token.create(payload);
     return {
       accessToken: token.accessToken,
       accessTokenExpiresAt: token.accessTokenExpiresAt,
@@ -70,7 +76,6 @@ module.exports = {
       client: { id: client.clientId },
       user: { id: user.userId },
     };
-    // return new Promise(resolve => resolve(db.token))
   },
 
   validateScope: (user, client, scope) => {
