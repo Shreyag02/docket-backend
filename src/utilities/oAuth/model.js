@@ -52,12 +52,14 @@ module.exports = {
       accessToken: token.accessToken,
       expiresIn: token.accessTokenExpiresAt,
       refreshToken: token.refreshToken,
+      refreshTokenExpiresIn: token.refreshTokenExpiresAt,
+      scope: token.scope,
+      tokenType: "Bearer",
       clientId: client.id,
       userId: user.id,
-      scope: token.scope,
     };
 
-    console.log(client, user);
+    console.log("from line 60", token);
 
     console.log({
       accessToken: token.accessToken,
@@ -84,6 +86,64 @@ module.exports = {
     }
     return scope;
   },
+  revokeToken: async (token) => {
+    console.log("REVOKING");
+    // imaginary DB queries
+    const tokenItem = await Token.findOne({
+      where: { refreshToken: token.refreshToken, archivedAt: null },
+    });
+    if (!tokenItem) return false;
+    else {
+      await Token.update(
+        {
+          archivedAt: new Date(),
+        },
+        {
+          where: {
+            refreshToken: tokenItem.refreshToken,
+          },
+        }
+      );
+      return true;
+    }
+  },
+
+  getRefreshToken: async (refreshToken) => {
+    // imaginary DB queries
+    const tokenItem = await Token.findOne({
+      where: { refreshToken },
+    });
+    const client =
+      tokenItem &&
+      (await Client.findOne({
+        where: { clientId: tokenItem.clientId },
+      }));
+    const user =
+      tokenItem &&
+      (await User.findOne({
+        where: { id: tokenItem.userId },
+      }));
+    console.log({ tokenItem });
+
+    if (tokenItem && client && user) {
+      console.log("returning");
+
+      console.log({
+        refreshToken: tokenItem.refreshToken,
+        refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
+        scope: tokenItem.scope,
+        client: client, // with 'id' property
+        user: user,
+      });
+      return {
+        refreshToken: tokenItem.refreshToken,
+        refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
+        scope: tokenItem.scope,
+        client: { id: client.clientId }, // with 'id' property
+        user: { id: user.id },
+      };
+    }
+  },
 };
 
 //password
@@ -97,9 +157,5 @@ module.exports = {
 // saveToken(token, client, user, [callback])
 // validateScope(user, client, scope, [callback])
 
-// {
-//   "clientId":"m8sYM0JWY1J0rIMDVE4kcNvPF0GeZcX8ND2ThcG7XFvUSEmd",
-//   "clientSecret":"GsRHF3cdw9DRQ0g3KLQXLK84Gx5CaduL9XuMHvWglfhKj2gD",
-//   "password": "Test@124",
-//   "email": "Test1@gmail.com"
-// }
+// getRefreshToken(refreshToken, [callback]);
+// revokeToken(token, [callback]);

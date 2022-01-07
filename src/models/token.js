@@ -19,10 +19,12 @@ module.exports = (sequelize, DataTypes) => {
       },
       expiresIn: DataTypes.DATE,
       refreshToken: DataTypes.STRING,
+      refreshTokenExpiresIn: DataTypes.DATE,
       scope: DataTypes.STRING,
       tokenType: DataTypes.STRING,
       clientId: DataTypes.STRING,
       userId: DataTypes.UUID,
+      archivedAt: DataTypes.DATE,
     },
     {
       sequelize,

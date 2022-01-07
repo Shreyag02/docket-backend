@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       clientName: DataTypes.STRING,
       dataUris: DataTypes.JSON,
       grants: DataTypes.JSON,
+      archivedAt: DataTypes.DATE,
     },
     {
       sequelize,

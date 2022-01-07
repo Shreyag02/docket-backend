@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       redirectedUri: DataTypes.STRING,
       clientId: DataTypes.STRING,
       userId: DataTypes.UUID,
+      archivedAt: DataTypes.DATE,
     },
     {
       sequelize,

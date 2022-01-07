@@ -16,6 +16,10 @@ module.exports = {
         type: Sequelize.STRING,
         field: "refresh_token",
       },
+      refreshTokenExpiresIn: {
+        type: Sequelize.DATE,
+        field: "refresh_token_expires_in",
+      },
       scope: {
         type: Sequelize.STRING,
       },
