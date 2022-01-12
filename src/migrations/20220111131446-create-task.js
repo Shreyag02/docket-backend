@@ -2,17 +2,23 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable("tasks", {
-      taskId: {
+      id: {
+        allowNull: false,
         type: Sequelize.STRING,
+        primaryKey: true,
+        defaultValue: Sequelize.UUIDV4,
       },
       taskName: {
         type: Sequelize.STRING,
+        field: "task_name",
       },
       userId: {
         type: Sequelize.STRING,
+        field: "user_id",
       },
       categoryId: {
         type: Sequelize.STRING,
+        field: "category_id",
       },
       description: {
         allowNull: true,
@@ -20,7 +26,8 @@ module.exports = {
       },
       tagId: {
         allowNull: true,
-        type: Sequelize.STRING,
+        type: Sequelize.JSON,
+        field: "tag_id",
       },
       priority: {
         allowNull: true,
@@ -28,12 +35,15 @@ module.exports = {
       },
       createDate: {
         type: Sequelize.DATE,
+        field: "create_date",
       },
       dueDate: {
         type: Sequelize.DATE,
+        field: "due_date",
       },
       addToMyDay: {
         type: Sequelize.BOOLEAN,
+        field: "add_to_my_day",
       },
       status: {
         type: Sequelize.STRING,

@@ -13,15 +13,20 @@ module.exports = (sequelize, DataTypes) => {
   }
   Category.init(
     {
-      categoryId: {
+      id: {
         primaryKey: true,
-        type: DataTypes.STRING,
+        type: DataTypes.UUID,
       },
       categoryName: DataTypes.STRING,
       userId: DataTypes.STRING,
       archivedAt: DataTypes.DATE,
     },
     {
+      hooks: {
+        beforeCreate: (category, _) => {
+          category.id = uuidv4();
+        },
+      },
       sequelize,
       modelName: "Category",
       underscored: true,

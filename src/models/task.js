@@ -13,15 +13,15 @@ module.exports = (sequelize, DataTypes) => {
   }
   Task.init(
     {
-      taskId: {
+      id: {
         primaryKey: true,
-        type: DataTypes.STRING,
+        type: DataTypes.UUID,
       },
       taskName: DataTypes.STRING,
       userId: DataTypes.STRING,
       categoryId: DataTypes.STRING,
       description: DataTypes.STRING,
-      tagId: DataTypes.STRING,
+      tagId: DataTypes.JSON,
       priority: DataTypes.STRING,
       createDate: DataTypes.DATE,
       dueDate: DataTypes.DATE,
@@ -29,6 +29,11 @@ module.exports = (sequelize, DataTypes) => {
       status: DataTypes.STRING,
     },
     {
+      hooks: {
+        beforeCreate: (task, _) => {
+          task.id = uuidv4();
+        },
+      },
       sequelize,
       modelName: "Task",
       underscored: true,

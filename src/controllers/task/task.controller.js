@@ -1,37 +1,34 @@
-const { Task } = require("../../models");
+const { Task, Category } = require("../../models");
 const { v4: uuidv4 } = require("uuid");
 
-const {
-  successResponse,
-  errorResponse,
-  encryptData,
-} = require("../../utilities/helper");
+const { successResponse, errorResponse } = require("../../utilities/helper");
 
-const bcrypt = require("bcrypt");
 module.exports = {
   create: async (req, res) => {
     try {
-      let { taskName, categoryId, userId } = req.body;
+      let { taskName, categoryName, userId } = req.body;
       console.log(req.body);
-
       console.log(Task);
-      //   const task = await User.findOne({
-      //     where: { email },
-      //   });
-      //   if (user) {
-      //     return errorResponse(
-      //       req,
-      //       res,
-      //       "User already exists with same email",
-      //       409
-      //     );
-      //   }
+
+      const category = await Category.findOne({
+        categoryName,
+        userId,
+      });
+      if (!category) {
+        return errorResponse(req, res, "Category does not exist", 409);
+      }
+      let dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 1);
 
       const payload = {
-        taskId: uuidv4(),
+        id: uuidv4(),
         taskName,
-        categoryId,
         userId,
+        categoryId: category.id,
+        createDate: new Date(),
+        dueDate,
+        addToMyDay: false,
+        status: "pending",
       };
       console.log(payload);
 
@@ -44,21 +41,81 @@ module.exports = {
     }
   },
 
-  login: async (req, res) => {
+  update: async (req, res) => {
     try {
-      const user = await User.findOne({
-        where: { email: req.body.email },
+      const task = await Task.findOne({
+        where: {
+          id: req.body.taskId,
+          userId: req.body.userId,
+        },
       });
-      if (!user) {
-        return errorResponse(req, res, "Incorrect Email Id", 403);
+
+      if (!task) {
+        return errorResponse(req, res, "Something went wrong. Try again", 403);
+      } else {
+        let newCategoryId = null;
+
+        if (req.body.categoryName) {
+          const newCategory = await Category.findOne({
+            categoryName,
+            userId,
+          });
+
+          if (!newCategory) {
+            return errorResponse(req, res, "Category does not exist", 409);
+          } else newCategoryId = newCategory.id;
+        }
+
+        await Task.update(
+          {
+            taskName: req.body.taskName || task.taskName,
+            categoryId: newCategoryId || task.categoryId,
+            dueDate: req.body.dueDate || task.dueDate,
+            addToMyDay: req.body.addToMyDay || task.addToMyDay,
+            status: req.body.status || task.status,
+          },
+          {
+            where: {
+              id: req.body.taskId,
+              userId: req.body.userId,
+            },
+          }
+        );
       }
 
-      bcrypt
-        .compare(req.body.password, user.password)
-        .then(() => console.log("true"))
-        .catch(() => errorResponse(req, res, "Incorrect Password", 403));
+      return successResponse(req, res, task);
+    } catch (error) {
+      return errorResponse(req, res, error.message);
+    }
+  },
 
-      return successResponse(req, res, user);
+  delete: async (req, res) => {
+    try {
+      const task = await Task.findOne({
+        where: {
+          id: req.body.taskId,
+          userId: req.body.userId,
+          archivedAt: null,
+        },
+      });
+
+      if (!task) {
+        return errorResponse(req, res, "Something went wrong. Try again", 403);
+      } else {
+        await Task.update(
+          {
+            archivedAt: new Date(),
+          },
+          {
+            where: {
+              id: req.body.taskId,
+              userId: req.body.userId,
+            },
+          }
+        );
+      }
+
+      return successResponse(req, res, task);
     } catch (error) {
       return errorResponse(req, res, error.message);
     }

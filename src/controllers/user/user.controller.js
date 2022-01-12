@@ -1,5 +1,6 @@
 const { User } = require("../../models");
 const { v4: uuidv4 } = require("uuid");
+const bcrypt = require("bcrypt");
 
 const {
   successResponse,
@@ -7,7 +8,6 @@ const {
   encryptData,
 } = require("../../utilities/helper");
 
-const bcrypt = require("bcrypt");
 module.exports = {
   register: async (req, res) => {
     try {
@@ -60,6 +60,35 @@ module.exports = {
         .then(() => console.log("true"))
         .catch(() => errorResponse(req, res, "Incorrect Password", 403));
 
+      return successResponse(req, res, user);
+    } catch (error) {
+      return errorResponse(req, res, error.message);
+    }
+  },
+
+  delete: async (req, res) => {
+    try {
+      const user = await User.findOne({
+        where: {
+          email: req.body.email,
+          archivedAt: null,
+        },
+      });
+
+      if (!user) {
+        return errorResponse(req, res, "Something went wrong. Try again", 403);
+      } else {
+        await User.update(
+          {
+            archivedAt: new Date(),
+          },
+          {
+            where: {
+              email: req.body.email,
+            },
+          }
+        );
+      }
       return successResponse(req, res, user);
     } catch (error) {
       return errorResponse(req, res, error.message);

@@ -2,11 +2,11 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable("tags", {
-      tagId: {
+      id: {
         allowNull: false,
         type: Sequelize.STRING,
         primaryKey: true,
-        field: "tag_id",
+        defaultValue: Sequelize.UUIDV4,
       },
       tagName: {
         type: Sequelize.STRING,
@@ -14,7 +14,7 @@ module.exports = {
       },
       userId: {
         type: Sequelize.STRING,
-        field: "user_Id",
+        field: "user_id",
       },
       createdAt: {
         allowNull: false,

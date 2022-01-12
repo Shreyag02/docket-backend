@@ -1,4 +1,4 @@
-const { Client, User, AuthorizationCode, Token } = require("../../models");
+const { Client, User, Token } = require("../../models");
 const bcrypt = require("bcrypt");
 
 const VALID_SCOPES = ["read", "write"];
@@ -6,14 +6,17 @@ const VALID_SCOPES = ["read", "write"];
 module.exports = {
   getClient: async (clientId, clientSecret) => {
     console.log("getclient");
+
     const client = await Client.findOne({
       where: { clientId },
     });
+
     console.log({
       id: client.clientId,
       redirectUris: client.dataUris,
       grants: client.grants,
     });
+
     if (client && client.clientSecret === clientSecret) {
       return {
         id: client.clientId,
@@ -25,10 +28,12 @@ module.exports = {
   getUser: async (username, password) => {
     console.log("getuser");
     console.log({ username, password });
+
     const user = await User.findOne({
       where: { email: username },
     });
     let flag = false;
+
     user &&
       (await bcrypt
         .compare(password, user.password)
@@ -69,7 +74,9 @@ module.exports = {
       client: { id: client.id },
       user: { id: user.id },
     });
+
     await Token.create(payload);
+
     return {
       accessToken: token.accessToken,
       accessTokenExpiresAt: token.accessTokenExpiresAt,
@@ -88,10 +95,11 @@ module.exports = {
   },
   revokeToken: async (token) => {
     console.log("REVOKING");
-    // imaginary DB queries
+
     const tokenItem = await Token.findOne({
       where: { refreshToken: token.refreshToken, archivedAt: null },
     });
+
     if (!tokenItem) return false;
     else {
       await Token.update(
@@ -109,15 +117,16 @@ module.exports = {
   },
 
   getRefreshToken: async (refreshToken) => {
-    // imaginary DB queries
     const tokenItem = await Token.findOne({
       where: { refreshToken },
     });
+
     const client =
       tokenItem &&
       (await Client.findOne({
         where: { clientId: tokenItem.clientId },
       }));
+
     const user =
       tokenItem &&
       (await User.findOne({
@@ -132,30 +141,17 @@ module.exports = {
         refreshToken: tokenItem.refreshToken,
         refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
         scope: tokenItem.scope,
-        client: client, // with 'id' property
+        client: client,
         user: user,
       });
+
       return {
         refreshToken: tokenItem.refreshToken,
         refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
         scope: tokenItem.scope,
-        client: { id: client.clientId }, // with 'id' property
+        client: { id: client.clientId },
         user: { id: user.id },
       };
     }
   },
 };
-
-//password
-
-// generateAccessToken(client, user, scope, [callback]) default
-// generateRefreshToken(client, user, scope, [callback]) default
-
-// getClient(clientId, clientSecret, [callback])
-// getUser(username, password, [callback])
-
-// saveToken(token, client, user, [callback])
-// validateScope(user, client, scope, [callback])
-
-// getRefreshToken(refreshToken, [callback]);
-// revokeToken(token, [callback]);

@@ -13,15 +13,20 @@ module.exports = (sequelize, DataTypes) => {
   }
   Tag.init(
     {
-      tagId: {
+      id: {
         primaryKey: true,
-        type: DataTypes.STRING,
+        type: DataTypes.UUID,
       },
       tagName: DataTypes.STRING,
       userId: DataTypes.STRING,
       archivedAt: DataTypes.DATE,
     },
     {
+      hooks: {
+        beforeCreate: (tag, _) => {
+          tag.id = uuidv4();
+        },
+      },
       sequelize,
       modelName: "Tag",
       underscored: true,

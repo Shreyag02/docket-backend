@@ -39,20 +39,49 @@ module.exports = {
     }
   },
 
-  login: async (req, res) => {
+  getClient: async (req, res) => {
     try {
       const client = await Client.findOne({
-        where: { clientName },
+        where: { clientName: req.body.clientName },
       });
       if (!client) {
         return errorResponse(req, res, "Incorrect Client Name", 403);
       }
 
-      if (req.body.clientSecret !== client.clientSecret) {
-        return errorResponse(req, res, "Incorrect client secret", 403);
-      }
+      // if (req.body.clientSecret !== client.clientSecret) {
+      //   return errorResponse(req, res, "Incorrect client secret", 403);
+      // }
 
-      return successResponse(req, res, "your client id is" + client.clientId);
+      return successResponse(req, res, client);
+    } catch (error) {
+      return errorResponse(req, res, error.message);
+    }
+  },
+
+  delete: async (req, res) => {
+    try {
+      const client = await Client.findOne({
+        where: {
+          clientName: req.body.clientName,
+          archivedAt: null,
+        },
+      });
+
+      if (!client) {
+        return errorResponse(req, res, "Something went wrong. Try again", 403);
+      } else {
+        await Client.update(
+          {
+            archivedAt: new Date(),
+          },
+          {
+            where: {
+              clientName: req.body.clientName,
+            },
+          }
+        );
+      }
+      return successResponse(req, res, client);
     } catch (error) {
       return errorResponse(req, res, error.message);
     }
