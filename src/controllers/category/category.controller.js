@@ -26,7 +26,7 @@ module.exports = {
       console.log(payload);
 
       Category.create(payload);
-      return successResponse(req, res, {});
+      return successResponse(req, res, payload);
     } catch (error) {
       console.log(error);
       console.log(error.stack);

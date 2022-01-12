@@ -11,8 +11,7 @@ module.exports = {
       console.log(Tag);
 
       const tag = await Tag.findOne({
-        tagName,
-        userId,
+        where: { tagName, userId },
       });
       if (tag) {
         return errorResponse(req, res, "Tag exist with same name", 409);

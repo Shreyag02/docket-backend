@@ -11,8 +11,7 @@ module.exports = {
       console.log(Task);
 
       const category = await Category.findOne({
-        categoryName,
-        userId,
+        where: { categoryName, userId },
       });
       if (!category) {
         return errorResponse(req, res, "Category does not exist", 409);
