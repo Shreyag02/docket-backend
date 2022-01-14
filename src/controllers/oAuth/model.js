@@ -155,7 +155,7 @@ module.exports = {
     }
   },
 
-  getAccessToken: (accessToken) => {
+  getAccessToken: async (accessToken) => {
     // imaginary DB queries
 
     const tokenItem = await Token.findOne({
