@@ -11,7 +11,7 @@ module.exports = {
       console.log(Category);
 
       const category = await Category.findOne({
-        categoryName,
+        name: categoryName,
         userId,
       });
       if (category) {
@@ -20,7 +20,7 @@ module.exports = {
 
       const payload = {
         id: uuidv4(),
-        categoryName,
+        name: categoryName,
         userId,
       };
       console.log(payload);
@@ -38,7 +38,7 @@ module.exports = {
     try {
       const category = await Category.findOne({
         where: {
-          categoryName: req.body.categoryId,
+          name: req.body.categoryName,
           userId: req.body.userId,
           archivedAt: null,
         },
@@ -53,7 +53,7 @@ module.exports = {
           },
           {
             where: {
-              categoryName: req.body.categoryId,
+              name: req.body.categoryName,
               userId: req.body.userId,
             },
           }

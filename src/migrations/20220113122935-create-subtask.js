@@ -1,7 +1,7 @@
 "use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("categories", {
+    await queryInterface.createTable("subtasks", {
       id: {
         allowNull: false,
         type: Sequelize.UUID,
@@ -11,14 +11,17 @@ module.exports = {
       name: {
         type: Sequelize.STRING,
       },
-      userId: {
+      taskId: {
         type: Sequelize.UUID,
-        field: "user_id",
+        field: "task_id",
         references: {
-          // User hasMany categories  1:n
-          model: "User",
+          // task hasMany subtasks  1:n
+          model: "Task",
           key: "id",
         },
+      },
+      status: {
+        type: Sequelize.BOOLEAN,
       },
       createdAt: {
         allowNull: false,
@@ -38,6 +41,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("categories");
+    await queryInterface.dropTable("subtasks");
   },
 };

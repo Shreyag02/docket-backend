@@ -4,17 +4,21 @@ module.exports = {
     await queryInterface.createTable("tags", {
       id: {
         allowNull: false,
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
         primaryKey: true,
         defaultValue: Sequelize.UUIDV4,
       },
-      tagName: {
+      name: {
         type: Sequelize.STRING,
-        field: "tag_name",
       },
       userId: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
         field: "user_id",
+        references: {
+          // User hasMany tags  1:n
+          model: "User",
+          key: "id",
+        },
       },
       createdAt: {
         allowNull: false,

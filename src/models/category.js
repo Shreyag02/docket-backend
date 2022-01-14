@@ -19,8 +19,8 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: DataTypes.UUID,
       },
-      categoryName: DataTypes.STRING,
-      userId: DataTypes.STRING,
+      name: DataTypes.STRING,
+      userId: DataTypes.UUID,
       archivedAt: DataTypes.DATE,
     },
     {

@@ -11,7 +11,7 @@ module.exports = {
       console.log(Tag);
 
       const tag = await Tag.findOne({
-        where: { tagName, userId },
+        where: { name: tagName, userId },
       });
       if (tag) {
         return errorResponse(req, res, "Tag exist with same name", 409);
@@ -19,7 +19,7 @@ module.exports = {
 
       const payload = {
         id: uuidv4(),
-        tagName,
+        name: tagName,
         userId,
       };
       console.log(payload);
@@ -37,7 +37,7 @@ module.exports = {
     try {
       const tag = await Tag.findOne({
         where: {
-          tagName: req.body.tagName,
+          name: req.body.tagName,
           userId: req.body.userId,
           archivedAt: null,
         },
@@ -52,7 +52,7 @@ module.exports = {
           },
           {
             where: {
-              tagName: req.body.tagName,
+              name: req.body.tagName,
               userId: req.body.userId,
             },
           }

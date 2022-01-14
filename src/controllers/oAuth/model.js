@@ -154,4 +154,44 @@ module.exports = {
       };
     }
   },
+
+  getAccessToken: (accessToken) => {
+    // imaginary DB queries
+
+    const tokenItem = await Token.findOne({
+      where: { accessToken },
+    });
+
+    const client =
+      tokenItem &&
+      (await Client.findOne({
+        where: { clientId: tokenItem.clientId },
+      }));
+
+    const user =
+      tokenItem &&
+      (await User.findOne({
+        where: { id: tokenItem.userId },
+      }));
+
+    if (tokenItem && client && user) {
+      console.log("returning");
+
+      console.log({
+        accessToken: tokenItem.accessToken,
+        accessTokenExpiresAt: tokenItem.accessTokenExpiresAt,
+        scope: tokenItem.scope,
+        client: { id: client.clientId },
+        user: { id: user.id },
+      });
+
+      return {
+        accessToken: tokenItem.accessToken,
+        accessTokenExpiresAt: tokenItem.accessTokenExpiresAt,
+        scope: tokenItem.scope,
+        client: { id: client.clientId },
+        user: { id: user.id },
+      };
+    }
+  },
 };

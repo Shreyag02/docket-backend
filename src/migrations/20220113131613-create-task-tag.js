@@ -1,22 +1,28 @@
 "use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("categories", {
+    await queryInterface.createTable("task_tags", {
       id: {
         allowNull: false,
-        type: Sequelize.UUID,
+        autoIncrement: true,
         primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
+        type: Sequelize.INTEGER,
       },
-      name: {
-        type: Sequelize.STRING,
-      },
-      userId: {
+      taskId: {
         type: Sequelize.UUID,
-        field: "user_id",
+        field: "task_id",
         references: {
-          // User hasMany categories  1:n
-          model: "User",
+          // Task hasMany Tags n:n
+          model: "Task",
+          key: "id",
+        },
+      },
+      tagId: {
+        type: Sequelize.UUID,
+        field: "tag_id",
+        references: {
+          // Tag hasMany Tasks n:n
+          model: "Tag",
           key: "id",
         },
       },
@@ -38,6 +44,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("categories");
+    await queryInterface.dropTable("task_tags");
   },
 };

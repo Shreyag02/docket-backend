@@ -6,12 +6,12 @@ const { successResponse, errorResponse } = require("../../utilities/helper");
 module.exports = {
   create: async (req, res) => {
     try {
-      let { taskName, categoryName, userId } = req.body;
+      let { taskName, categoryName, userId, addToMyDay } = req.body;
       console.log(req.body);
       console.log(Task);
 
       const category = await Category.findOne({
-        where: { categoryName, userId },
+        where: { name: categoryName, userId },
       });
       if (!category) {
         return errorResponse(req, res, "Category does not exist", 409);
@@ -24,10 +24,9 @@ module.exports = {
         taskName,
         userId,
         categoryId: category.id,
-        createDate: new Date(),
         dueDate,
-        addToMyDay: false,
-        status: "pending",
+        addToMyDay,
+        status: false,
       };
       console.log(payload);
 
@@ -56,7 +55,7 @@ module.exports = {
 
         if (req.body.categoryName) {
           const newCategory = await Category.findOne({
-            categoryName,
+            name: categoryName,
             userId,
           });
 
@@ -67,7 +66,7 @@ module.exports = {
 
         await Task.update(
           {
-            taskName: req.body.taskName || task.taskName,
+            name: req.body.taskName || task.name,
             categoryId: newCategoryId || task.categoryId,
             dueDate: req.body.dueDate || task.dueDate,
             addToMyDay: req.body.addToMyDay || task.addToMyDay,

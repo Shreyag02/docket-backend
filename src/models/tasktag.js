@@ -1,9 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
-const { v4: uuidv4 } = require("uuid");
-
 module.exports = (sequelize, DataTypes) => {
-  class Tag extends Model {
+  class TaskTag extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,26 +11,22 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Tag.init(
+  TaskTag.init(
     {
       id: {
         primaryKey: true,
-        type: DataTypes.UUID,
+        autoIncrement: true,
+        type: DataTypes.INTEGER,
       },
-      name: DataTypes.STRING,
-      userId: DataTypes.UUID,
+      taskId: DataTypes.UUID,
+      tagId: DataTypes.UUID,
       archivedAt: DataTypes.DATE,
     },
     {
-      hooks: {
-        beforeCreate: (tag, _) => {
-          tag.id = uuidv4();
-        },
-      },
       sequelize,
-      modelName: "Tag",
+      modelName: "TaskTag",
       underscored: true,
     }
   );
-  return Tag;
+  return TaskTag;
 };

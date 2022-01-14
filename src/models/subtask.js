@@ -3,7 +3,7 @@ const { Model } = require("sequelize");
 const { v4: uuidv4 } = require("uuid");
 
 module.exports = (sequelize, DataTypes) => {
-  class Task extends Model {
+  class Subtask extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,33 +13,27 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Task.init(
+  Subtask.init(
     {
       id: {
         primaryKey: true,
         type: DataTypes.UUID,
       },
       name: DataTypes.STRING,
-      userId: DataTypes.UUID,
-      categoryId: DataTypes.STRING,
-      description: DataTypes.STRING,
-      priority: DataTypes.ENUM,
-      // createDate: DataTypes.DATE,
-      dueDate: DataTypes.DATE,
-      addToMyDay: DataTypes.DATE,
+      taskId: DataTypes.UUID,
       status: DataTypes.BOOLEAN,
       archivedAt: DataTypes.DATE,
     },
     {
       hooks: {
-        beforeCreate: (task, _) => {
-          task.id = uuidv4();
+        beforeCreate: (subtask, _) => {
+          subtask.id = uuidv4();
         },
       },
       sequelize,
-      modelName: "Task",
+      modelName: "Subtask",
       underscored: true,
     }
   );
-  return Task;
+  return Subtask;
 };
