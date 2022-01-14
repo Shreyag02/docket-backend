@@ -179,7 +179,7 @@ module.exports = {
 
       console.log({
         accessToken: tokenItem.accessToken,
-        accessTokenExpiresAt: tokenItem.accessTokenExpiresAt,
+        accessTokenExpiresAt: tokenItem.expiresIn,
         scope: tokenItem.scope,
         client: { id: client.clientId },
         user: { id: user.id },
@@ -187,7 +187,7 @@ module.exports = {
 
       return {
         accessToken: tokenItem.accessToken,
-        accessTokenExpiresAt: tokenItem.accessTokenExpiresAt,
+        accessTokenExpiresAt: tokenItem.expiresIn,
         scope: tokenItem.scope,
         client: { id: client.clientId },
         user: { id: user.id },
