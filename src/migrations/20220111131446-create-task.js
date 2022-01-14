@@ -35,7 +35,7 @@ module.exports = {
       },
       priority: {
         allowNull: true,
-        type: Sequelize.ENUM,
+        type: Sequelize.STRING,
       },
       dueDate: {
         type: Sequelize.DATE,
