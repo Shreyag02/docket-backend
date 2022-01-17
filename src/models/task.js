@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       priority: DataTypes.ENUM("urgent", "medium", "low"),
       dueDate: DataTypes.DATE,
       addToMyDay: DataTypes.DATE,
-      status: DataTypes.BOOLEAN,
+      status: DataTypes.ENUM("pending", "completed"),
       archivedAt: DataTypes.DATE,
     },
     {
