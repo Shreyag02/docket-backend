@@ -1,4 +1,4 @@
-const { Tag } = require("../../models");
+const { Tag, User } = require("../../models");
 const { v4: uuidv4 } = require("uuid");
 
 const { successResponse, errorResponse } = require("../../utilities/helper");
@@ -43,7 +43,7 @@ module.exports = {
         },
         include: User,
       });
-      console.log(tag.users);
+      console.log(tag);
 
       if (!tag) {
         return errorResponse(req, res, "Something went wrong. Try again", 403);

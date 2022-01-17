@@ -160,17 +160,17 @@ module.exports = {
 
     const tokenItem = await Token.findOne({
       where: { accessToken },
+      include: User,
     });
 
     const client =
       tokenItem &&
       (await Client.findOne({
         where: { clientId: tokenItem.clientId },
-        include: User,
       }));
 
     const user = tokenItem.users;
-    console.log("testing associations", user);
+    console.log("testing associations", tokenItem, user);
     // tokenItem &&
     // (await User.findOne({
     //   where: { id: tokenItem.userId },
