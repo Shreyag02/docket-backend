@@ -11,20 +11,20 @@ module.exports = {
       taskId: {
         type: Sequelize.UUID,
         field: "task_id",
-        references: {
-          // Task hasMany Tags n:n
-          model: "Task",
-          key: "id",
-        },
+        // references: {
+        //   // Task hasMany Tags n:n
+        //   model: "Task",
+        //   key: "id",
+        // },
       },
       tagId: {
         type: Sequelize.UUID,
         field: "tag_id",
-        references: {
-          // Tag hasMany Tasks n:n
-          model: "Tag",
-          key: "id",
-        },
+        // references: {
+        //   // Tag hasMany Tasks n:n
+        //   model: "Tag",
+        //   key: "id",
+        // },
       },
       createdAt: {
         allowNull: false,

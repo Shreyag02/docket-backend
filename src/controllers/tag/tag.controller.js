@@ -42,6 +42,7 @@ module.exports = {
           archivedAt: null,
         },
       });
+      console.log(tag.users);
 
       if (!tag) {
         return errorResponse(req, res, "Something went wrong. Try again", 403);

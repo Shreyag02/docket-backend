@@ -16,7 +16,7 @@ module.exports = {
         field: "user_id",
         references: {
           // User hasMany tags  1:n
-          model: "User",
+          model: "users",
           key: "id",
         },
       },

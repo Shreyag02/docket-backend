@@ -23,11 +23,11 @@ module.exports = {
       userId: {
         type: Sequelize.UUID,
         field: "user_id",
-        references: {
-          // User hasMany aiuthorization codes  1:n
-          model: "User",
-          key: "id",
-        },
+        // references: {
+        //   // User hasMany aiuthorization codes  1:n
+        //   model: "User",
+        //   key: "id",
+        // },
       },
       createdAt: {
         allowNull: false,

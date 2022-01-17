@@ -14,14 +14,14 @@ module.exports = {
       taskId: {
         type: Sequelize.UUID,
         field: "task_id",
-        references: {
-          // task hasMany subtasks  1:n
-          model: "Task",
-          key: "id",
-        },
+        // references: {
+        //   // task hasMany subtasks  1:n
+        //   model: "Task",
+        //   key: "id",
+        // },
       },
       status: {
-        type: Sequelize.BOOLEAN,
+        type: Sequelize.ENUM("pending", "completed"),
       },
       createdAt: {
         allowNull: false,

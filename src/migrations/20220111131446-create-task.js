@@ -14,20 +14,20 @@ module.exports = {
       userId: {
         type: Sequelize.UUID,
         field: "user_id",
-        references: {
-          // User hasMany tasks 1:n
-          model: "User",
-          key: "id",
-        },
+        // references: {
+        //   // User hasMany tasks 1:n
+        //   model: "User",
+        //   key: "id",
+        // },
       },
       categoryId: {
         type: Sequelize.STRING,
         field: "category_id",
-        references: {
-          // Category hasMany tasks  1:n
-          model: "Category",
-          key: "id",
-        },
+        // references: {
+        //   // Category hasMany tasks  1:n
+        //   model: "Category",
+        //   key: "id",
+        // },
       },
       description: {
         allowNull: true,
@@ -35,7 +35,7 @@ module.exports = {
       },
       priority: {
         allowNull: true,
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("urgent", "medium", "low"),
       },
       dueDate: {
         type: Sequelize.DATE,
@@ -47,7 +47,7 @@ module.exports = {
         field: "add_to_my_day",
       },
       status: {
-        type: Sequelize.BOOLEAN,
+        type: Sequelize.ENUM("pending", "completed"),
       },
       createdAt: {
         allowNull: false,
