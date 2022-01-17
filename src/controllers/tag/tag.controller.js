@@ -41,6 +41,7 @@ module.exports = {
           userId: req.body.userId,
           archivedAt: null,
         },
+        include: User,
       });
       console.log(tag.users);
 
