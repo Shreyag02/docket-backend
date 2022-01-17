@@ -169,7 +169,7 @@ module.exports = {
         where: { clientId: tokenItem.clientId },
       }));
 
-    console.log("testing associations jlkj", tokenItem);
+    console.log("testing associations jlkj", tokenItem.User);
     const user =
       tokenItem &&
       (await User.findOne({
