@@ -14,11 +14,11 @@ module.exports = {
       userId: {
         type: Sequelize.UUID,
         field: "user_id",
-        // references: {
-        //   // User hasMany categories  1:n
-        //   model: "User",
-        //   key: "id",
-        // },
+        references: {
+          // User hasMany categories  1:n
+          model: "users",
+          key: "id",
+        },
       },
       createdAt: {
         allowNull: false,

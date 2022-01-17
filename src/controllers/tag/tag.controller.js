@@ -41,9 +41,7 @@ module.exports = {
           userId: req.body.userId,
           archivedAt: null,
         },
-        include: User,
       });
-      console.log(tag);
 
       if (!tag) {
         return errorResponse(req, res, "Something went wrong. Try again", 403);

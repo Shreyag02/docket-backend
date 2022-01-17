@@ -18,10 +18,12 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Tag, {
         foreignKey: "userId",
       });
-      // this.belongsToMany(models.Token, { through: "userId" });
-      // this.belongsToMany(models.Tag, { through: "userId" });
-      // this.belongsToMany(models.Category, { through: "userId" });
-      // this.belongsToMany(models.Task, { through: "userId" });
+      this.hasMany(models.Task, {
+        foreignKey: "userId",
+      });
+      this.hasMany(models.Categories, {
+        foreignKey: "userId",
+      });
     }
   }
   User.init(

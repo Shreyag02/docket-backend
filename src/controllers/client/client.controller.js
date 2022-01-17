@@ -48,10 +48,6 @@ module.exports = {
         return errorResponse(req, res, "Incorrect Client Name", 403);
       }
 
-      // if (req.body.clientSecret !== client.clientSecret) {
-      //   return errorResponse(req, res, "Incorrect client secret", 403);
-      // }
-
       return successResponse(req, res, client);
     } catch (error) {
       return errorResponse(req, res, error.message);

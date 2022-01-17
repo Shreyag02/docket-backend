@@ -119,38 +119,28 @@ module.exports = {
   getRefreshToken: async (refreshToken) => {
     const tokenItem = await Token.findOne({
       where: { refreshToken },
+      include: [User, Client],
     });
 
-    const client =
-      tokenItem &&
-      (await Client.findOne({
-        where: { clientId: tokenItem.clientId },
-      }));
-
-    const user =
-      tokenItem &&
-      (await User.findOne({
-        where: { id: tokenItem.userId },
-      }));
     console.log({ tokenItem });
 
-    if (tokenItem && client && user) {
+    if (tokenItem) {
       console.log("returning");
 
       console.log({
         refreshToken: tokenItem.refreshToken,
         refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
         scope: tokenItem.scope,
-        client: client,
-        user: user,
+        client: tokenItem.Client,
+        user: tokenItem.User,
       });
 
       return {
         refreshToken: tokenItem.refreshToken,
         refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
         scope: tokenItem.scope,
-        client: { id: client.clientId },
-        user: { id: user.id },
+        client: { id: tokenItem.Client.clientId },
+        user: { id: tokenItem.User.id },
       };
     }
   },
@@ -160,39 +150,26 @@ module.exports = {
 
     const tokenItem = await Token.findOne({
       where: { accessToken },
-      include: User,
+      include: [User, Client],
     });
 
-    const client =
-      tokenItem &&
-      (await Client.findOne({
-        where: { clientId: tokenItem.clientId },
-      }));
-
-    console.log("testing associations jlkj", tokenItem.User);
-    const user =
-      tokenItem &&
-      (await User.findOne({
-        where: { id: tokenItem.userId },
-      }));
-
-    if (tokenItem && client && user) {
+    if (tokenItem) {
       console.log("returning");
 
       console.log({
         accessToken: tokenItem.accessToken,
         accessTokenExpiresAt: tokenItem.expiresIn,
         scope: tokenItem.scope,
-        client: { id: client.clientId },
-        user: { id: user.id },
+        client: { id: tokenItem.Client.clientId },
+        user: { id: tokenItem.User.id },
       });
 
       return {
         accessToken: tokenItem.accessToken,
         accessTokenExpiresAt: tokenItem.expiresIn,
         scope: tokenItem.scope,
-        client: { id: client.clientId },
-        user: { id: user.id },
+        client: { id: tokenItem.Client.clientId },
+        user: { id: tokenItem.User.id },
       };
     }
   },
