@@ -169,12 +169,12 @@ module.exports = {
         where: { clientId: tokenItem.clientId },
       }));
 
-    const user = tokenItem.users;
-    console.log("testing associations", tokenItem, user);
-    // tokenItem &&
-    // (await User.findOne({
-    //   where: { id: tokenItem.userId },
-    // }));
+    console.log("testing associations jlkj", tokenItem);
+    const user =
+      tokenItem &&
+      (await User.findOne({
+        where: { id: tokenItem.userId },
+      }));
 
     if (tokenItem && client && user) {
       console.log("returning");
