@@ -21,7 +21,7 @@ module.exports = {
         },
       },
       categoryId: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
         field: "category_id",
         references: {
           // Category hasMany tasks  1:n

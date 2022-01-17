@@ -33,7 +33,7 @@ module.exports = {
         references: {
           // Client hasMany tokens  1:n
           model: "clients",
-          key: "clientId",
+          key: "client_id",
         },
       },
       userId: {

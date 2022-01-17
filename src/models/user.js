@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Task, {
         foreignKey: "userId",
       });
-      this.hasMany(models.Categories, {
+      this.hasMany(models.Category, {
         foreignKey: "userId",
       });
     }

@@ -26,7 +26,6 @@ module.exports = {
         categoryId: category.id,
         dueDate,
         addToMyDay,
-        status: 0,
       };
       console.log(payload);
 

@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Subtask, {
         foreignKey: "taskId",
       });
-      this.belongsToMany(models.Tags, {
+      this.belongsToMany(models.Tag, {
         through: "task_tags",
         foreignKey: "taskId",
       });
@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       name: DataTypes.STRING,
       userId: DataTypes.UUID,
-      categoryId: DataTypes.STRING,
+      categoryId: DataTypes.UUID,
       description: DataTypes.STRING,
       priority: DataTypes.ENUM("urgent", "medium", "low"),
       dueDate: DataTypes.DATE,
