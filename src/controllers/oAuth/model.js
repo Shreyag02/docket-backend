@@ -150,27 +150,73 @@ module.exports = {
 
     const tokenItem = await Token.findOne({
       where: { accessToken },
-      include: [User, Client],
+      include: [
+        {
+          model: User,
+          as: "currUser",
+        },
+        {
+          model: Client,
+          as: "currClient",
+        },
+      ],
     });
 
-    if (tokenItem) {
+    const client =
+      tokenItem &&
+      (await Client.findOne({
+        where: { clientId: tokenItem.clientId },
+      }));
+
+    console.log(
+      "testing associations jlkj",
+      tokenItem,
+      tokenItem.currUser,
+      tokenItem.currClient
+    );
+    const user =
+      tokenItem &&
+      (await User.findOne({
+        where: { id: tokenItem.userId },
+      }));
+
+    if (tokenItem && client && user) {
       console.log("returning");
 
-      console.log({
-        accessToken: tokenItem.accessToken,
-        accessTokenExpiresAt: tokenItem.expiresIn,
-        scope: tokenItem.scope,
-        client: { id: tokenItem.Client.clientId },
-        user: { id: tokenItem.User.id },
-      });
+      // console.log({
+      //   accessToken: tokenItem.accessToken,
+      //   accessTokenExpiresAt: tokenItem.expiresIn,
+      //   scope: tokenItem.scope,
+      //   client: { id: client.clientId },
+      //   user: { id: user.id },
+      // });
 
       return {
         accessToken: tokenItem.accessToken,
         accessTokenExpiresAt: tokenItem.expiresIn,
         scope: tokenItem.scope,
-        client: { id: tokenItem.Client.clientId },
-        user: { id: tokenItem.User.id },
+        client: { id: client.clientId },
+        user: { id: user.id },
       };
+
+      // if (tokenItem) {
+      //   console.log("returning");
+
+      //   console.log({
+      //     accessToken: tokenItem.accessToken,
+      //     accessTokenExpiresAt: tokenItem.expiresIn,
+      //     scope: tokenItem.scope,
+      //     client: { id: tokenItem.Client.clientId },
+      //     user: { id: tokenItem.User.id },
+      //   });
+
+      //   return {
+      //     accessToken: tokenItem.accessToken,
+      //     accessTokenExpiresAt: tokenItem.expiresIn,
+      //     scope: tokenItem.scope,
+      //     client: { id: tokenItem.Client.clientId },
+      //     user: { id: tokenItem.User.id },
+      //   };
     }
   },
 };
