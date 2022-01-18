@@ -50,6 +50,8 @@ app.use(
   secureRoutes
 );
 
+// oauthServer.server.authenticate()
+
 try {
   db.sequelize.authenticate();
   console.log("Connection has been established successfully.");
