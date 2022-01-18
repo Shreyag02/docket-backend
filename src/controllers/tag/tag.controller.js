@@ -7,7 +7,7 @@ module.exports = {
   create: async (req, res) => {
     try {
       let { tagName, userId } = req.body;
-      console.log("testing many things", req);
+      console.log("testing many things", req.headers.authorization);
       console.log(Tag);
 
       const tag = await Tag.findOne({
