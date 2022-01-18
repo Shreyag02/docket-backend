@@ -13,6 +13,7 @@ module.exports = {
       const category = await Category.findOne({
         name: categoryName,
         userId,
+        archivedAt: null,
       });
       if (category) {
         return errorResponse(req, res, "Category exist with same name", 409);

@@ -11,7 +11,7 @@ module.exports = {
       let { clientName } = req.body;
 
       const client = await Client.findOne({
-        where: { clientName },
+        where: { clientName, archivedAt: null },
       });
       if (client) {
         return errorResponse(

@@ -17,7 +17,7 @@ module.exports = {
 
       console.log(User);
       const user = await User.findOne({
-        where: { email },
+        where: { email, archivedAt: null },
       });
       if (user) {
         return errorResponse(

@@ -7,11 +7,11 @@ module.exports = {
   create: async (req, res) => {
     try {
       let { tagName, userId } = req.body;
-      console.log(req.body);
+      console.log("testing many things", req);
       console.log(Tag);
 
       const tag = await Tag.findOne({
-        where: { name: tagName, userId },
+        where: { name: tagName, userId, archivedAt: null },
       });
       if (tag) {
         return errorResponse(req, res, "Tag exist with same name", 409);
