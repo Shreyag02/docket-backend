@@ -153,11 +153,11 @@ module.exports = {
       include: [
         {
           model: User,
-          as: "currUser",
+          // as: "currUser",
         },
         {
           model: Client,
-          as: "currClient",
+          // as: "currClient",
         },
       ],
     });
@@ -171,8 +171,8 @@ module.exports = {
     console.log(
       "testing associations jlkj",
       tokenItem,
-      tokenItem.currUser,
-      tokenItem.currClient
+      tokenItem.User,
+      tokenItem.Client
     );
     const user =
       tokenItem &&
