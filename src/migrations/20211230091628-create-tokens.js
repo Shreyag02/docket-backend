@@ -30,11 +30,11 @@ module.exports = {
       clientId: {
         type: Sequelize.STRING,
         field: "client_id",
-        references: {
-          // Client hasMany tokens  1:n
-          model: "clients",
-          key: "client_id",
-        },
+        // references: {
+        //   // Client hasMany tokens  1:n
+        //   model: "clients",
+        //   key: "client_id",
+        // },
       },
       userId: {
         type: Sequelize.UUID,
