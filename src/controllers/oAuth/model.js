@@ -8,7 +8,7 @@ module.exports = {
     console.log("getclient");
 
     const client = await Client.findOne({
-      where: { clientId },
+      where: { clientId, archivedAt: null },
     });
 
     console.log({
@@ -123,25 +123,56 @@ module.exports = {
     });
 
     console.log({ tokenItem });
+    const client =
+      tokenItem &&
+      (await Client.findOne({
+        where: { clientId: tokenItem.clientId },
+      }));
 
-    if (tokenItem) {
+    const user =
+      tokenItem &&
+      (await User.findOne({
+        where: { id: tokenItem.userId },
+      }));
+    console.log({ tokenItem });
+
+    if (tokenItem && client && user) {
       console.log("returning");
 
       console.log({
         refreshToken: tokenItem.refreshToken,
         refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
         scope: tokenItem.scope,
-        client: tokenItem.Client,
-        user: tokenItem.User,
+        client: client,
+        user: user,
       });
 
       return {
         refreshToken: tokenItem.refreshToken,
         refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
         scope: tokenItem.scope,
-        client: { id: tokenItem.Client.clientId },
-        user: { id: tokenItem.User.id },
+        client: { id: client.clientId },
+        user: { id: user.id },
       };
+
+      // if (tokenItem) {
+      //   console.log("returning");
+
+      //   console.log({
+      //     refreshToken: tokenItem.refreshToken,
+      //     refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
+      //     scope: tokenItem.scope,
+      //     client: tokenItem.Client,
+      //     user: tokenItem.User,
+      //   });
+
+      //   return {
+      //     refreshToken: tokenItem.refreshToken,
+      //     refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
+      //     scope: tokenItem.scope,
+      //     client: { id: tokenItem.Client.clientId },
+      //     user: { id: tokenItem.User.id },
+      //   };
     }
   },
 
