@@ -119,60 +119,28 @@ module.exports = {
   getRefreshToken: async (refreshToken) => {
     const tokenItem = await Token.findOne({
       where: { refreshToken },
-      include: [User],
+      include: [
+        {
+          model: User,
+          as: "user",
+        },
+        {
+          model: Client,
+          as: "client",
+        },
+      ],
     });
 
     console.log({ tokenItem });
-    const client =
-      tokenItem &&
-      (await Client.findOne({
-        where: { clientId: tokenItem.clientId },
-      }));
 
-    const user =
-      tokenItem &&
-      (await User.findOne({
-        where: { id: tokenItem.userId },
-      }));
-    console.log({ tokenItem });
-
-    if (tokenItem && client && user) {
-      console.log("returning");
-
-      console.log({
-        refreshToken: tokenItem.refreshToken,
-        refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
-        scope: tokenItem.scope,
-        client: client,
-        user: user,
-      });
-
+    if (tokenItem) {
       return {
         refreshToken: tokenItem.refreshToken,
         refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
         scope: tokenItem.scope,
-        client: { id: client.clientId },
-        user: { id: user.id },
+        client: { id: tokenItem.client.clientId },
+        user: { id: tokenItem.user.id },
       };
-
-      // if (tokenItem) {
-      //   console.log("returning");
-
-      //   console.log({
-      //     refreshToken: tokenItem.refreshToken,
-      //     refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
-      //     scope: tokenItem.scope,
-      //     client: tokenItem.Client,
-      //     user: tokenItem.User,
-      //   });
-
-      //   return {
-      //     refreshToken: tokenItem.refreshToken,
-      //     refreshTokenExpiresAt: tokenItem.refreshTokenExpiresIn,
-      //     scope: tokenItem.scope,
-      //     client: { id: tokenItem.Client.clientId },
-      //     user: { id: tokenItem.User.id },
-      //   };
     }
   },
 
@@ -184,70 +152,23 @@ module.exports = {
       include: [
         {
           model: User,
-          // as: "currUser",
+          as: "user",
         },
         {
           model: Client,
-          // as: "currClient",
+          as: "client",
         },
       ],
     });
 
-    const client =
-      tokenItem &&
-      (await Client.findOne({
-        where: { clientId: tokenItem.clientId },
-      }));
-
-    console.log(
-      "testing associations jlkj",
-      tokenItem,
-      tokenItem.User,
-      tokenItem.Client
-    );
-    const user =
-      tokenItem &&
-      (await User.findOne({
-        where: { id: tokenItem.userId },
-      }));
-
-    if (tokenItem && client && user) {
-      console.log("returning");
-
-      // console.log({
-      //   accessToken: tokenItem.accessToken,
-      //   accessTokenExpiresAt: tokenItem.expiresIn,
-      //   scope: tokenItem.scope,
-      //   client: { id: client.clientId },
-      //   user: { id: user.id },
-      // });
-
+    if (tokenItem) {
       return {
         accessToken: tokenItem.accessToken,
         accessTokenExpiresAt: tokenItem.expiresIn,
         scope: tokenItem.scope,
-        client: { id: client.clientId },
-        user: { id: user.id },
+        client: { id: tokenItem.client.clientId },
+        user: { id: tokenItem.user.id },
       };
-
-      // if (tokenItem) {
-      //   console.log("returning");
-
-      //   console.log({
-      //     accessToken: tokenItem.accessToken,
-      //     accessTokenExpiresAt: tokenItem.expiresIn,
-      //     scope: tokenItem.scope,
-      //     client: { id: tokenItem.Client.clientId },
-      //     user: { id: tokenItem.User.id },
-      //   });
-
-      //   return {
-      //     accessToken: tokenItem.accessToken,
-      //     accessTokenExpiresAt: tokenItem.expiresIn,
-      //     scope: tokenItem.scope,
-      //     client: { id: tokenItem.Client.clientId },
-      //     user: { id: tokenItem.User.id },
-      //   };
     }
   },
 };

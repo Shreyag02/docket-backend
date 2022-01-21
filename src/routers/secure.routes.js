@@ -7,13 +7,16 @@ const taskController = require("../controllers/task/task.controller");
 const router = require("express").Router();
 
 router.post("/createTag", tagController.create);
-router.post("/deleteTag", tagController.delete);
+router.get("/tags", tagController.get);
+router.delete("/deleteTag", tagController.delete);
 
 router.post("/createCategory", categoryController.create);
-router.post("/deleteCategory", categoryController.delete);
+router.get("/categories", categoryController.get);
+router.delete("/deleteCategory", categoryController.delete);
 
 router.post("/createTask", taskController.create);
-router.post("/updateTask", taskController.update);
-router.post("/deleteTask", taskController.delete);
+router.put("/updateTask", taskController.update);
+router.get("/tasks", taskController.get);
+router.delete("/deleteTask", taskController.delete);
 
 module.exports = router;

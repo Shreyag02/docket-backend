@@ -6,13 +6,13 @@ const oauthServer = require("../controllers/oAuth/server");
 
 const router = require("express").Router();
 
-router.post("/login", userController.login);
+router.get("/login", userController.login);
 router.post("/register", userController.register);
-router.post("/deleteUser", userController.delete);
+router.delete("/deleteUser", userController.delete);
 
-router.post("/getClient", clientController.getClient);
+router.get("/getClient", clientController.getClient);
 router.post("/registerClient", clientController.register);
-router.post("/deleteClient", clientController.delete);
+router.delete("/deleteClient", clientController.delete);
 
 router.post(
   "/token",

@@ -12,13 +12,15 @@ module.exports = {
   register: async (req, res) => {
     try {
       let { email, password, firstName, lastName } = req.body;
-      console.log(req.body);
+
       password = encryptData(password);
 
-      console.log(User);
+      console.log(req.body);
+
       const user = await User.findOne({
         where: { email, archivedAt: null },
       });
+
       if (user) {
         return errorResponse(
           req,
@@ -38,10 +40,12 @@ module.exports = {
       console.log(payload);
 
       User.create(payload);
-      return successResponse(req, res, {});
+
+      return successResponse(req, res, payload);
     } catch (error) {
       console.log(error);
       console.log(error.stack);
+
       return errorResponse(req, res, error.message);
     }
   },
@@ -49,8 +53,9 @@ module.exports = {
   login: async (req, res) => {
     try {
       const user = await User.findOne({
-        where: { email: req.body.email },
+        where: { email: req.body.email, archivedAt: null },
       });
+
       if (!user) {
         return errorResponse(req, res, "Incorrect Email Id", 403);
       }

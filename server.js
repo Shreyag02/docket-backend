@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const oauthServer = require("./src/controllers/oAuth/server");
+const Request = require("oauth2-server").Request;
+const Response = require("oauth2-server").Response;
 
 const db = require("./src/models");
 
@@ -44,6 +46,29 @@ app.use("/public", publicRoutes);
 app.use(
   "/secure",
   (req, res, next) => {
+    console.log("hello there");
+
+    // let request = new Request(req);
+    // console.log(request instanceof Request);
+    // let response = new Response(res);
+    // return oauthServer.server
+    //   .authenticate(request, response)
+    //   .then(function (token) {
+    //     // res.locals.oauth = {token: token};
+    //     console.log(token);
+    //     next();
+    //   })
+    //   .catch(function (err) {
+    //     // handle error condition
+    //     console.log("error", err);
+    //   });
+
+    // return oauthServer.server
+    //   .authenticate(req, res)
+    //   .then((token) => {
+    //     console.log("from test", token);
+    //   })
+    //   .catch((err) => console.log("theowgf", err)),
     return next();
   },
   oauthServer.authenticate(),

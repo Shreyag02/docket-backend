@@ -6,41 +6,73 @@ const { successResponse, errorResponse } = require("../../utilities/helper");
 module.exports = {
   create: async (req, res) => {
     try {
-      let { categoryName, userId } = req.body;
-      console.log(req.body);
-      console.log(Category);
+      let oauth = res.locals.oauth.token;
+      let { categoryName } = req.body;
 
       const category = await Category.findOne({
-        name: categoryName,
-        userId,
-        archivedAt: null,
+        where: {
+          name: categoryName,
+          userId: oauth.user.id,
+          archivedAt: null,
+        },
       });
+
       if (category) {
-        return errorResponse(req, res, "Category exist with same name", 409);
+        return errorResponse(
+          req,
+          res,
+          `Category exist with same name ${category} ${categoryName}`,
+          409
+        );
       }
 
       const payload = {
         id: uuidv4(),
         name: categoryName,
-        userId,
+        userId: oauth.user.id,
       };
+
       console.log(payload);
 
       Category.create(payload);
+
       return successResponse(req, res, payload);
     } catch (error) {
       console.log(error);
       console.log(error.stack);
+
+      return errorResponse(req, res, error.message);
+    }
+  },
+
+  get: async (req, res) => {
+    try {
+      let oauth = res.locals.oauth.token;
+
+      const categories = await Category.findAll({
+        where: {
+          userId: oauth.user.id,
+          archivedAt: null,
+        },
+      });
+
+      return successResponse(req, res, categories);
+    } catch (error) {
+      console.log(error);
+      console.log(error.stack);
+
       return errorResponse(req, res, error.message);
     }
   },
 
   delete: async (req, res) => {
     try {
+      let oauth = res.locals.oauth.token;
+
       const category = await Category.findOne({
         where: {
           name: req.body.categoryName,
-          userId: req.body.userId,
+          userId: oauth.user.id,
           archivedAt: null,
         },
       });
@@ -55,7 +87,7 @@ module.exports = {
           {
             where: {
               name: req.body.categoryName,
-              userId: req.body.userId,
+              userId: oauth.user.id,
             },
           }
         );

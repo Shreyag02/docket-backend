@@ -31,7 +31,7 @@ module.exports = {
       console.log(payload);
 
       Client.create(payload);
-      return successResponse(req, res, client);
+      return successResponse(req, res, payload);
     } catch (error) {
       console.log(error);
       console.log(error.stack);
