@@ -83,16 +83,22 @@ module.exports = {
       if (!user) {
         return errorResponse(req, res, "Something went wrong. Try again", 403);
       } else {
-        await User.update(
-          {
-            archivedAt: new Date(),
-          },
-          {
-            where: {
-              email: req.body.email,
-            },
-          }
-        );
+        bcrypt
+          .compare(req.body.password, user.password)
+          .then(
+            async () =>
+              await User.update(
+                {
+                  archivedAt: new Date(),
+                },
+                {
+                  where: {
+                    email: req.body.email,
+                  },
+                }
+              )
+          )
+          .catch(() => errorResponse(req, res, "Incorrect Password", 403));
       }
       return successResponse(req, res, user);
     } catch (error) {

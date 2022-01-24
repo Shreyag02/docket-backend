@@ -71,7 +71,7 @@ module.exports = {
 
       const category = await Category.findOne({
         where: {
-          name: req.body.categoryName,
+          id: req.params.id,
           userId: oauth.user.id,
           archivedAt: null,
         },
@@ -86,7 +86,7 @@ module.exports = {
           },
           {
             where: {
-              name: req.body.categoryName,
+              name: req.params.id,
               userId: oauth.user.id,
             },
           }

@@ -29,7 +29,7 @@ module.exports = {
 
       const payload = {
         id: uuidv4(),
-        taskName,
+        name: taskName,
         userId: oauth.user.id,
         categoryId: category.id,
         dueDate,
@@ -119,7 +119,7 @@ module.exports = {
 
       const task = await Task.findOne({
         where: {
-          id: req.body.taskId,
+          id: req.params.id,
           userId: oauth.user.id,
           archivedAt: null,
         },
@@ -134,7 +134,7 @@ module.exports = {
           },
           {
             where: {
-              taskId: req.body.taskId,
+              taskId: req.params.id,
             },
           }
         );
@@ -145,7 +145,7 @@ module.exports = {
           },
           {
             where: {
-              id: req.body.taskId,
+              id: req.params.id,
               userId: oauth.user.id,
             },
           }
@@ -161,33 +161,29 @@ module.exports = {
   get: async (req, res) => {
     try {
       let oauth = res.locals.oauth.token;
-      console.log("testing params", req.query);
+      console.log("testing params", req.query, req.params);
 
-      let tasks;
+      var whereStatement = {
+        userId: oauth.user.id,
+        archivedAt: null,
+      };
 
       if (req.query.status) {
-        tasks = await Task.findAll({
-          where: {
-            userId: oauth.user.id,
-            archivedAt: null,
-            status: req.query.status,
-          },
-          include: [Subtask],
-        });
-      } else {
-        tasks = await Task.findAll({
-          where: {
-            userId: oauth.user.id,
-            archivedAt: null,
-          },
-          include: [
-            {
-              model: Subtask,
-              as: "subtasks",
-            },
-          ],
-        });
+        whereStatement.status = req.query.status;
       }
+      if (req.params.id) {
+        whereStatement.id = req.params.id;
+      }
+
+      const tasks = await Task.findAll({
+        where: whereStatement,
+        include: [
+          {
+            model: Subtask,
+            as: "subtasks",
+          },
+        ],
+      });
 
       return successResponse(req, res, tasks);
     } catch (error) {

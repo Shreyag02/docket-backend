@@ -8,7 +8,6 @@ const router = require("express").Router();
 
 router.get("/login", userController.login);
 router.post("/register", userController.register);
-router.delete("/deleteUser", userController.delete);
 
 router.get("/getClient", clientController.getClient);
 router.post("/registerClient", clientController.register);

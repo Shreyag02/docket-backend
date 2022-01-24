@@ -48,7 +48,7 @@ module.exports = {
 
       const tag = await Tag.findOne({
         where: {
-          name: req.body.tagName,
+          name: req.params.id,
           userId: oauth.user.id,
           archivedAt: null,
         },
@@ -63,7 +63,7 @@ module.exports = {
           },
           {
             where: {
-              name: req.body.tagName,
+              name: req.params.id,
               userId: oauth.user.id,
             },
           }
