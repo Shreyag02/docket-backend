@@ -9,9 +9,6 @@ module.exports = {
       let oauth = res.locals.oauth.token;
       let { taskName, categoryName, addToMyDay } = req.body;
 
-      console.log(req.body);
-      console.log(Task);
-
       const category = await Category.findOne({
         where: {
           name: categoryName,
@@ -36,8 +33,6 @@ module.exports = {
         addToMyDay,
         status: "pending",
       };
-
-      console.log(payload);
 
       Task.create(payload);
 
@@ -161,7 +156,6 @@ module.exports = {
   get: async (req, res) => {
     try {
       let oauth = res.locals.oauth.token;
-      console.log("testing params", req.query, req.params);
 
       var whereStatement = {
         userId: oauth.user.id,

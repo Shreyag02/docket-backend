@@ -1,7 +1,6 @@
 const OAuthServer = require("express-oauth-server");
 const model = require("./model");
 
-console.log("from oauth server", model);
 module.exports = new OAuthServer({
   model: model,
   grants: ["password", "refresh_token"],

@@ -6,8 +6,6 @@ const { successResponse, errorResponse } = require("../../utilities/helper");
 module.exports = {
   create: async (req, res) => {
     try {
-      console.log("testing token", res.locals.oauth.token);
-
       let { tagName } = req.body;
       let oauth = res.locals.oauth.token;
 
@@ -28,8 +26,6 @@ module.exports = {
         name: tagName,
         userId: oauth.user.id,
       };
-
-      console.log(payload);
 
       Tag.create(payload);
 

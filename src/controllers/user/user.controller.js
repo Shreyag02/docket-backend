@@ -15,8 +15,6 @@ module.exports = {
 
       password = encryptData(password);
 
-      console.log(req.body);
-
       const user = await User.findOne({
         where: { email, archivedAt: null },
       });
@@ -37,7 +35,6 @@ module.exports = {
         lastName,
         password,
       };
-      console.log(payload);
 
       User.create(payload);
 

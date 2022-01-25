@@ -32,8 +32,6 @@ module.exports = {
         userId: oauth.user.id,
       };
 
-      console.log(payload);
-
       Category.create(payload);
 
       return successResponse(req, res, payload);

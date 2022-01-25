@@ -28,13 +28,13 @@ module.exports = {
         clientName,
         grants: ["refresh_token", "password"],
       };
-      console.log(payload);
 
       Client.create(payload);
       return successResponse(req, res, payload);
     } catch (error) {
       console.log(error);
       console.log(error.stack);
+
       return errorResponse(req, res, error.message);
     }
   },

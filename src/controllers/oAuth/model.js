@@ -5,16 +5,8 @@ const VALID_SCOPES = ["read", "write"];
 
 module.exports = {
   getClient: async (clientId, clientSecret) => {
-    console.log("getclient");
-
     const client = await Client.findOne({
       where: { clientId, archivedAt: null },
-    });
-
-    console.log({
-      id: client.clientId,
-      redirectUris: client.dataUris,
-      grants: client.grants,
     });
 
     if (client && client.clientSecret === clientSecret) {
@@ -25,10 +17,8 @@ module.exports = {
       };
     }
   },
-  getUser: async (username, password) => {
-    console.log("getuser");
-    console.log({ username, password });
 
+  getUser: async (username, password) => {
     const user = await User.findOne({
       where: { email: username },
     });
@@ -43,16 +33,11 @@ module.exports = {
         .catch(() => console.log("Incorrect Password")));
 
     if (flag) {
-      console.log("executed");
       return { username: user.email, password: user.password, id: user.id };
-    } else {
-      console.log("not executed");
     }
   },
 
   saveToken: async (token, client, user) => {
-    console.log("savetoken");
-
     const payload = {
       accessToken: token.accessToken,
       expiresIn: token.accessTokenExpiresAt,
@@ -63,17 +48,6 @@ module.exports = {
       clientId: client.id,
       userId: user.id,
     };
-
-    console.log("from line 60", token);
-
-    console.log({
-      accessToken: token.accessToken,
-      accessTokenExpiresAt: token.accessTokenExpiresAt,
-      refreshToken: token.refreshToken,
-      scope: token.scope,
-      client: { id: client.id },
-      user: { id: user.id },
-    });
 
     await Token.create(payload);
 
@@ -93,9 +67,8 @@ module.exports = {
     }
     return scope;
   },
-  revokeToken: async (token) => {
-    console.log("REVOKING");
 
+  revokeToken: async (token) => {
     const tokenItem = await Token.findOne({
       where: { refreshToken: token.refreshToken, archivedAt: null },
     });
@@ -131,8 +104,6 @@ module.exports = {
       ],
     });
 
-    console.log({ tokenItem });
-
     if (tokenItem) {
       return {
         refreshToken: tokenItem.refreshToken,
@@ -145,8 +116,6 @@ module.exports = {
   },
 
   getAccessToken: async (accessToken) => {
-    // imaginary DB queries
-
     const tokenItem = await Token.findOne({
       where: { accessToken },
       include: [
