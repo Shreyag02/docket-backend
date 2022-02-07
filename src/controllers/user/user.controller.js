@@ -72,11 +72,11 @@ module.exports = {
         throw new DataForbiddenError("Incorrect Email Id");
       }
 
-      let flag;
-
-      bcrypt.compare(password, user.password).then((result) => {
-        flag = result;
-      });
+      let flag = await bcrypt
+        .compare(password, user.password)
+        .then(async (result) => {
+          return result;
+        });
 
       if (!flag) {
         throw new DataForbiddenError("Incorrect Password");
@@ -107,11 +107,11 @@ module.exports = {
       if (!user) {
         throw new DataNotFoundError("User not found");
       }
-      let flag;
-
-      bcrypt.compare(password, user.password).then((result) => {
-        flag = result;
-      });
+      let flag = await bcrypt
+        .compare(password, user.password)
+        .then(async (result) => {
+          return result;
+        });
 
       if (!flag) {
         throw new DataForbiddenError("Incorrect Password");
