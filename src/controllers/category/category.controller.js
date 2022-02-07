@@ -5,8 +5,8 @@ const { successResponse, errorResponse } = require("../../utilities/helper");
 
 const { categoryRegister } = require("../../utilities/validations/category");
 const {
-  dataNotFoundError,
-  dataDuplicateError,
+  DataNotFoundError,
+  DataDuplicateError,
 } = require("../../utilities/views/errorResponse");
 const loggerService = require("../../services/loggerService");
 
@@ -27,7 +27,7 @@ module.exports = {
       });
 
       if (category) {
-        throw new dataDuplicateError("Category exists with same name");
+        throw new DataDuplicateError("Category exists with same name");
       }
 
       const payload = {
@@ -80,7 +80,7 @@ module.exports = {
       });
 
       if (!category) {
-        throw new dataNotFoundError("Category not found");
+        throw new DataNotFoundError("Category not found");
       }
 
       await Category.update(
@@ -121,7 +121,7 @@ module.exports = {
       });
 
       if (!category) {
-        throw new dataNotFoundError("Category not found");
+        throw new DataNotFoundError("Category not found");
       }
 
       return successResponse(req, res, category.tasks);

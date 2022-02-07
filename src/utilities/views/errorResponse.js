@@ -1,4 +1,4 @@
-class dataForbiddenError extends Error {
+class DataForbiddenError extends Error {
   constructor(message) {
     super(message);
     this.name = "Data Forbidden";
@@ -7,7 +7,7 @@ class dataForbiddenError extends Error {
   }
 }
 
-class dataNotFoundError extends Error {
+class DataNotFoundError extends Error {
   constructor(message) {
     super(message);
     this.name = "Data Not Found";
@@ -16,7 +16,7 @@ class dataNotFoundError extends Error {
   }
 }
 
-class dataDuplicateError extends Error {
+class DataDuplicateError extends Error {
   constructor(message) {
     super(message);
     this.name = "Data Duplicate";
@@ -26,9 +26,9 @@ class dataDuplicateError extends Error {
 }
 
 module.exports = {
-  dataForbiddenError,
+  DataForbiddenError,
 
-  dataNotFoundError,
+  DataNotFoundError,
 
-  dataDuplicateError,
+  DataDuplicateError,
 };

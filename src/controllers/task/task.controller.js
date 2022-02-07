@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const { successResponse, errorResponse } = require("../../utilities/helper");
 
 const { taskRegister } = require("../../utilities/validations/task");
-const { dataNotFoundError } = require("../../utilities/views/errorResponse");
+const { DataNotFoundError } = require("../../utilities/views/errorResponse");
 
 module.exports = {
   create: async (req, res) => {
@@ -23,7 +23,7 @@ module.exports = {
       });
 
       if (!category) {
-        throw new dataNotFoundError("Category not found");
+        throw new DataNotFoundError("Category not found");
       }
 
       let dueDate = new Date();
@@ -62,7 +62,7 @@ module.exports = {
       });
 
       if (!task) {
-        throw new dataNotFoundError("Task not found");
+        throw new DataNotFoundError("Task not found");
       } else {
         let newCategoryId = null;
 
@@ -88,7 +88,7 @@ module.exports = {
           });
 
           if (!newCategory) {
-            throw new dataNotFoundError("Category does not exist");
+            throw new DataNotFoundError("Category does not exist");
           } else newCategoryId = newCategory.id;
         }
 
@@ -131,7 +131,7 @@ module.exports = {
       });
 
       if (!task) {
-        throw new dataNotFoundError("Task not found");
+        throw new DataNotFoundError("Task not found");
       } else {
         await Subtask.update(
           {

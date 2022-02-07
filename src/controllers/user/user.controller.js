@@ -16,9 +16,9 @@ const {
 } = require("../../utilities/validations/user");
 
 const {
-  dataDuplicateError,
-  dataForbiddenError,
-  dataNotFoundError,
+  DataDuplicateError,
+  DataForbiddenError,
+  DataNotFoundError,
 } = require("../../utilities/views/errorResponse");
 
 module.exports = {
@@ -36,7 +36,7 @@ module.exports = {
       });
 
       if (user) {
-        throw new dataDuplicateError("User already exists with same email");
+        throw new DataDuplicateError("User already exists with same email");
       }
 
       const payload = {
@@ -69,7 +69,7 @@ module.exports = {
       });
 
       if (!user) {
-        throw new dataForbiddenError("Incorrect Email Id");
+        throw new DataForbiddenError("Incorrect Email Id");
       }
 
       let flag;
@@ -79,7 +79,7 @@ module.exports = {
       });
 
       if (!flag) {
-        throw new dataForbiddenError("Incorrect Password");
+        throw new DataForbiddenError("Incorrect Password");
       }
 
       return successResponse(req, res, user);
@@ -105,7 +105,7 @@ module.exports = {
       });
 
       if (!user) {
-        throw new dataNotFoundError("User not found");
+        throw new DataNotFoundError("User not found");
       }
       let flag;
 
@@ -114,7 +114,7 @@ module.exports = {
       });
 
       if (!flag) {
-        throw new dataForbiddenError("Incorrect Password");
+        throw new DataForbiddenError("Incorrect Password");
       }
 
       async () =>

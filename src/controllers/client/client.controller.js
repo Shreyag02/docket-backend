@@ -7,8 +7,8 @@ const {
 
 const { clientRegister } = require("../../utilities/validations/client");
 const {
-  dataDuplicateError,
-  dataNotFoundError,
+  DataDuplicateError,
+  DataNotFoundError,
 } = require("../../utilities/views/errorResponse");
 
 module.exports = {
@@ -23,7 +23,7 @@ module.exports = {
       });
 
       if (client) {
-        throw new dataDuplicateError("Client exists with same name");
+        throw new DataDuplicateError("Client exists with same name");
       }
 
       const payload = {
@@ -55,7 +55,7 @@ module.exports = {
       });
 
       if (!client) {
-        throw new dataNotFoundError("Client not found");
+        throw new DataNotFoundError("Client not found");
       }
 
       return successResponse(req, res, client);
@@ -81,7 +81,7 @@ module.exports = {
       });
 
       if (!client) {
-        throw new dataNotFoundError("Client not found");
+        throw new DataNotFoundError("Client not found");
       } else {
         await Client.update(
           {

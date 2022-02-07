@@ -5,8 +5,8 @@ const { successResponse, errorResponse } = require("../../utilities/helper");
 
 const { tagRegister } = require("../../utilities/validations/tag");
 const {
-  dataDuplicateError,
-  dataNotFoundError,
+  DataDuplicateError,
+  DataNotFoundError,
 } = require("../../utilities/views/errorResponse");
 
 module.exports = {
@@ -26,7 +26,7 @@ module.exports = {
       });
 
       if (tag) {
-        throw new dataDuplicateError("Tag exist with same name");
+        throw new DataDuplicateError("Tag exist with same name");
       }
 
       const payload = {
@@ -59,7 +59,7 @@ module.exports = {
       });
 
       if (!tag) {
-        throw new dataNotFoundError("Tag is not found");
+        throw new DataNotFoundError("Tag is not found");
       } else {
         await Tag.update(
           {
@@ -120,7 +120,7 @@ module.exports = {
       });
 
       if (!tag) {
-        throw new dataNotFoundError("Tag not found");
+        throw new DataNotFoundError("Tag not found");
       }
 
       return successResponse(req, res, tag.tasks);
