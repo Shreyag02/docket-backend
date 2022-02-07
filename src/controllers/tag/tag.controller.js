@@ -1,12 +1,20 @@
-const { Tag } = require("../../models");
+const { Tag, Task } = require("../../models");
 const { v4: uuidv4 } = require("uuid");
 
 const { successResponse, errorResponse } = require("../../utilities/helper");
 
+const { tagRegister } = require("../../utilities/validations/tag");
+const {
+  dataDuplicateError,
+  dataNotFoundError,
+} = require("../../utilities/views/errorResponse");
+
 module.exports = {
   create: async (req, res) => {
     try {
-      let { tagName } = req.body;
+      const value = await tagRegister.validateAsync(req.body);
+
+      let { tagName } = value;
       let oauth = res.locals.oauth.token;
 
       const tag = await Tag.findOne({
@@ -18,7 +26,7 @@ module.exports = {
       });
 
       if (tag) {
-        return errorResponse(req, res, "Tag exist with same name", 409);
+        throw new dataDuplicateError("Tag exist with same name");
       }
 
       const payload = {
@@ -31,10 +39,10 @@ module.exports = {
 
       return successResponse(req, res, payload);
     } catch (error) {
-      console.log(error);
-      console.log(error.stack);
+      logger.error(error);
+      logger.error(error.stack);
 
-      return errorResponse(req, res, error.message);
+      return errorResponse(req, res, error.message, error);
     }
   },
 
@@ -51,7 +59,7 @@ module.exports = {
       });
 
       if (!tag) {
-        return errorResponse(req, res, "Something went wrong. Try again", 403);
+        throw new dataNotFoundError("Tag is not found");
       } else {
         await Tag.update(
           {
@@ -68,7 +76,10 @@ module.exports = {
 
       return successResponse(req, res, tag);
     } catch (error) {
-      return errorResponse(req, res, error.message);
+      logger.error(error);
+      logger.error(error.stack);
+
+      return errorResponse(req, res, error.message, error);
     }
   },
 
@@ -85,10 +96,39 @@ module.exports = {
 
       return successResponse(req, res, tags);
     } catch (error) {
-      console.log(error);
-      console.log(error.stack);
+      logger.error(error);
+      logger.error(error.stack);
 
       return errorResponse(req, res, error.message);
+    }
+  },
+
+  getTasks: async (req, res) => {
+    try {
+      let oauth = res.locals.oauth.token;
+
+      const tag = await Tag.findOne({
+        where: {
+          id: req.params.id,
+          userId: oauth.user.id,
+          archivedAt: null,
+        },
+        include: {
+          model: Task,
+          as: "tasks",
+        },
+      });
+
+      if (!tag) {
+        throw new dataNotFoundError("Tag not found");
+      }
+
+      return successResponse(req, res, tag.tasks);
+    } catch (error) {
+      logger.error(error);
+      logger.error(error.stack);
+
+      return errorResponse(req, res, error.message, error);
     }
   },
 };

@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.hasMany(models.Token, {
         foreignKey: "clientId",
+        as: "tokens",
       });
     }
   }

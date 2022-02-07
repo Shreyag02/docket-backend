@@ -5,21 +5,25 @@ const {
   generateRandomId,
 } = require("../../utilities/helper");
 
+const { clientRegister } = require("../../utilities/validations/client");
+const {
+  dataDuplicateError,
+  dataNotFoundError,
+} = require("../../utilities/views/errorResponse");
+
 module.exports = {
   register: async (req, res) => {
     try {
-      let { clientName } = req.body;
+      const value = await clientRegister.validateAsync(req.body);
+
+      let { clientName } = value;
 
       const client = await Client.findOne({
         where: { clientName, archivedAt: null },
       });
+
       if (client) {
-        return errorResponse(
-          req,
-          res,
-          "Client already exists with same name",
-          409
-        );
+        throw new dataDuplicateError("Client exists with same name");
       }
 
       const payload = {
@@ -30,41 +34,54 @@ module.exports = {
       };
 
       Client.create(payload);
+
       return successResponse(req, res, payload);
     } catch (error) {
-      console.log(error);
-      console.log(error.stack);
+      logger.error(error);
+      logger.error(error.stack);
 
-      return errorResponse(req, res, error.message);
+      return errorResponse(req, res, error.message, error);
     }
   },
 
   getClient: async (req, res) => {
     try {
+      const value = await clientRegister.validateAsync(req.body);
+
+      let { clientName } = value;
+
       const client = await Client.findOne({
-        where: { clientName: req.body.clientName },
+        where: { clientName, archivedAt: null },
       });
+
       if (!client) {
-        return errorResponse(req, res, "Incorrect Client Name", 403);
+        throw new dataNotFoundError("Client not found");
       }
 
       return successResponse(req, res, client);
     } catch (error) {
-      return errorResponse(req, res, error.message);
+      logger.error(error);
+      logger.error(error.stack);
+
+      return errorResponse(req, res, error.message, error);
     }
   },
 
   delete: async (req, res) => {
     try {
+      const value = await clientRegister.validateAsync(req.body);
+
+      let { clientName } = value;
+
       const client = await Client.findOne({
         where: {
-          clientName: req.body.clientName,
+          clientName,
           archivedAt: null,
         },
       });
 
       if (!client) {
-        return errorResponse(req, res, "Something went wrong. Try again", 403);
+        throw new dataNotFoundError("Client not found");
       } else {
         await Client.update(
           {
@@ -72,14 +89,17 @@ module.exports = {
           },
           {
             where: {
-              clientName: req.body.clientName,
+              clientName,
             },
           }
         );
       }
       return successResponse(req, res, client);
     } catch (error) {
-      return errorResponse(req, res, error.message);
+      logger.error(error);
+      logger.error(error.stack);
+
+      return errorResponse(req, res, error.message, error);
     }
   },
 };

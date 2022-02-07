@@ -2,16 +2,32 @@ const { User } = require("../../models");
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 
+const logger = require("../../services/loggerService");
+
 const {
   successResponse,
   errorResponse,
   encryptData,
 } = require("../../utilities/helper");
 
+const {
+  userRegister,
+  userLoginDel,
+} = require("../../utilities/validations/user");
+
+const {
+  dataDuplicateError,
+  dataForbiddenError,
+  dataNotFoundError,
+} = require("../../utilities/views/errorResponse");
+
 module.exports = {
   register: async (req, res) => {
+    logger.info("user register route is accessed");
     try {
-      let { email, password, firstName, lastName } = req.body;
+      const value = await userRegister.validateAsync(req.body);
+
+      let { email, password, firstName, lastName } = value;
 
       password = encryptData(password);
 
@@ -20,12 +36,7 @@ module.exports = {
       });
 
       if (user) {
-        return errorResponse(
-          req,
-          res,
-          "User already exists with same email",
-          409
-        );
+        throw new dataDuplicateError("User already exists with same email");
       }
 
       const payload = {
@@ -40,66 +51,90 @@ module.exports = {
 
       return successResponse(req, res, payload);
     } catch (error) {
-      console.log(error);
-      console.log(error.stack);
+      logger.error(error);
+      logger.error(error.stack);
 
-      return errorResponse(req, res, error.message);
+      return errorResponse(req, res, error.message, error);
     }
   },
 
   login: async (req, res) => {
     try {
+      const value = await userLoginDel.validateAsync(req.body);
+
+      let { email, password } = value;
+
       const user = await User.findOne({
-        where: { email: req.body.email, archivedAt: null },
+        where: { email, archivedAt: null },
       });
 
       if (!user) {
-        return errorResponse(req, res, "Incorrect Email Id", 403);
+        throw new dataForbiddenError("Incorrect Email Id");
       }
 
-      bcrypt
-        .compare(req.body.password, user.password)
-        .then(() => console.log("true"))
-        .catch(() => errorResponse(req, res, "Incorrect Password", 403));
+      let flag;
+
+      bcrypt.compare(password, user.password).then((result) => {
+        flag = result;
+      });
+
+      if (!flag) {
+        throw new dataForbiddenError("Incorrect Password");
+      }
 
       return successResponse(req, res, user);
     } catch (error) {
-      return errorResponse(req, res, error.message);
+      logger.error(error);
+      logger.error(error.stack);
+
+      return errorResponse(req, res, error.message, error);
     }
   },
 
   delete: async (req, res) => {
     try {
+      const value = await userLoginDel.validateAsync(req.body);
+
+      let { email, password } = value;
+
       const user = await User.findOne({
         where: {
-          email: req.body.email,
+          email,
           archivedAt: null,
         },
       });
 
       if (!user) {
-        return errorResponse(req, res, "Something went wrong. Try again", 403);
-      } else {
-        bcrypt
-          .compare(req.body.password, user.password)
-          .then(
-            async () =>
-              await User.update(
-                {
-                  archivedAt: new Date(),
-                },
-                {
-                  where: {
-                    email: req.body.email,
-                  },
-                }
-              )
-          )
-          .catch(() => errorResponse(req, res, "Incorrect Password", 403));
+        throw new dataNotFoundError("User not found");
       }
+      let flag;
+
+      bcrypt.compare(password, user.password).then((result) => {
+        flag = result;
+      });
+
+      if (!flag) {
+        throw new dataForbiddenError("Incorrect Password");
+      }
+
+      async () =>
+        await User.update(
+          {
+            archivedAt: new Date(),
+          },
+          {
+            where: {
+              email,
+            },
+          }
+        );
+
       return successResponse(req, res, user);
     } catch (error) {
-      return errorResponse(req, res, error.message);
+      logger.error(error);
+      logger.error(error.stack);
+
+      return errorResponse(req, res, error.message, error);
     }
   },
 };

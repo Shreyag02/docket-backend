@@ -1,13 +1,18 @@
-const { Task, Category, Subtask } = require("../../models");
+const { Task, Category, Subtask, Tag } = require("../../models");
 const { v4: uuidv4 } = require("uuid");
 
 const { successResponse, errorResponse } = require("../../utilities/helper");
 
+const { taskRegister } = require("../../utilities/validations/task");
+const { dataNotFoundError } = require("../../utilities/views/errorResponse");
+
 module.exports = {
   create: async (req, res) => {
     try {
+      const value = await taskRegister.validateAsync(req.body);
+
       let oauth = res.locals.oauth.token;
-      let { taskName, categoryName, addToMyDay } = req.body;
+      let { taskName, categoryName, addToMyDay } = value;
 
       const category = await Category.findOne({
         where: {
@@ -18,7 +23,7 @@ module.exports = {
       });
 
       if (!category) {
-        return errorResponse(req, res, "Category does not exist", 409);
+        throw new dataNotFoundError("Category not found");
       }
 
       let dueDate = new Date();
@@ -38,10 +43,10 @@ module.exports = {
 
       return successResponse(req, res, payload);
     } catch (error) {
-      console.log(error);
-      console.log(error.stack);
+      logger.error(error);
+      logger.error(error.stack);
 
-      return errorResponse(req, res, error.message);
+      return errorResponse(req, res, error.message, error);
     }
   },
 
@@ -57,22 +62,24 @@ module.exports = {
       });
 
       if (!task) {
-        return errorResponse(req, res, "Something went wrong. Try again", 403);
+        throw new dataNotFoundError("Task not found");
       } else {
         let newCategoryId = null;
 
+        //update subtasks
         if (req.body.subtasks) {
-          req.body.subtasks.map((subtask) => {
+          req.body.subtasks?.map((subtask) => {
             const payload = {
               id: uuidv4(),
-              name: subtask.subtaskName,
+              name: subtask?.subtaskName,
               taskId: req.body.taskId,
-              status: subtask.status || "pending",
+              status: subtask?.status || "pending",
             };
 
             Subtask.create(payload);
           });
         }
+        //create tags
 
         if (req.body.categoryName) {
           const newCategory = await Category.findOne({
@@ -81,7 +88,7 @@ module.exports = {
           });
 
           if (!newCategory) {
-            return errorResponse(req, res, "Category does not exist", 409);
+            throw new dataNotFoundError("Category does not exist");
           } else newCategoryId = newCategory.id;
         }
 
@@ -104,7 +111,10 @@ module.exports = {
 
       return successResponse(req, res, task);
     } catch (error) {
-      return errorResponse(req, res, error.message);
+      logger.error(error);
+      logger.error(error.stack);
+
+      return errorResponse(req, res, error.message, error);
     }
   },
 
@@ -121,7 +131,7 @@ module.exports = {
       });
 
       if (!task) {
-        return errorResponse(req, res, "Something went wrong. Try again", 403);
+        throw new dataNotFoundError("Task not found");
       } else {
         await Subtask.update(
           {
@@ -149,6 +159,9 @@ module.exports = {
 
       return successResponse(req, res, task);
     } catch (error) {
+      logger.error(error);
+      logger.error(error.stack);
+
       return errorResponse(req, res, error.message);
     }
   },
@@ -157,7 +170,7 @@ module.exports = {
     try {
       let oauth = res.locals.oauth.token;
 
-      var whereStatement = {
+      let whereStatement = {
         userId: oauth.user.id,
         archivedAt: null,
       };
@@ -176,15 +189,19 @@ module.exports = {
             model: Subtask,
             as: "subtasks",
           },
+          {
+            model: Tag,
+            as: "tags",
+          },
         ],
       });
 
       return successResponse(req, res, tasks);
     } catch (error) {
-      console.log(error);
-      console.log(error.stack);
+      logger.error(error);
+      logger.error(error.stack);
 
-      return errorResponse(req, res, error.message);
+      return errorResponse(req, res, error.message, error);
     }
   },
 };

@@ -1,23 +1,35 @@
 require("dotenv").config();
 const express = require("express");
 const oauthServer = require("./src/controllers/oAuth/server");
-const Request = require("oauth2-server").Request;
-const Response = require("oauth2-server").Response;
 
 const db = require("./src/models");
 
 const publicRoutes = require("./src/routers/public.routes");
 const secureRoutes = require("./src/routers/secure.routes");
 
+const expressPinoLogger = require("express-pino-logger");
+const logger = require("./src/services/loggerService");
+
 const bodyParser = require("body-parser");
 const PORT = process.env.PORT || 3000;
 
-var cors = require("cors");
+let cors = require("cors");
 const app = express();
+
+//cors enabling
 app.use(cors());
 
+//read json and form data
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+//pino logger
+const loggerMidlleware = expressPinoLogger({
+  logger: logger,
+  autoLogging: true,
+});
+
+app.use(loggerMidlleware);
 
 //ROUTES
 app.use("/public", publicRoutes);

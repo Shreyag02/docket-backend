@@ -12,10 +12,12 @@ router.delete("/deleteUser", userController.delete);
 
 router.post("/createTag", tagController.create);
 router.get("/tags", tagController.get);
+router.get("/tagTasks/:id", tagController.getTasks);
 router.delete("/deleteTag/:id", tagController.delete);
 
 router.post("/createCategory", categoryController.create);
 router.get("/categories", categoryController.get);
+router.get("/categoryTasks/:id", categoryController.getTasks);
 router.delete("/deleteCategory/:id", categoryController.delete);
 
 router.post("/createTask", taskController.create);

@@ -14,15 +14,19 @@ module.exports = (sequelize, DataTypes) => {
 
       this.hasMany(models.Token, {
         foreignKey: "userId",
+        as: "tokens",
       });
       this.hasMany(models.Tag, {
         foreignKey: "userId",
+        as: "tags",
       });
       this.hasMany(models.Task, {
         foreignKey: "userId",
+        as: "tasks",
       });
       this.hasMany(models.Category, {
         foreignKey: "userId",
+        as: "categories",
       });
     }
   }

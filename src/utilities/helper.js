@@ -5,26 +5,26 @@ module.exports = {
   encryptData: (value) => {
     return hashSync(value, salt);
   },
-  successResponse: (req, res, data, code = 200) =>
+  successResponse: (req, res, data) =>
     res.send({
-      code,
       data,
+      error: null,
       success: true,
+      meta: null,
     }),
-  errorResponse: (
-    req,
-    res,
-    errorMessage = "Something went wrong",
-    code = 500,
-    error = {}
-  ) =>
-    res.status(500).json({
-      code,
-      errorMessage,
-      error,
+
+  errorResponse: (req, res, errorMessage = "Something went wrong", data) =>
+    res.status(data.code || 500).json({
       data: null,
+      error: {
+        errorCode: data.code || 500,
+        errorStatus: data.status || "Internal Server Error",
+        errorMessage,
+      },
       success: false,
+      meta: null,
     }),
+
   generateRandomId: (length) => {
     {
       let result = "";
