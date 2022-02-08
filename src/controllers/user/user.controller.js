@@ -118,19 +118,22 @@ module.exports = {
         throw new DataForbiddenError("Incorrect Password");
       }
 
-      async () =>
-        await User.update(
-          {
-            archivedAt: new Date(),
+      await User.update(
+        {
+          archivedAt: new Date(),
+        },
+        {
+          where: {
+            id: oauth.user.id,
           },
-          {
-            where: {
-              id: oauth.user.id,
-            },
-          }
-        );
+        }
+      );
 
-      return successResponse(req, res, user);
+      return successResponse(
+        req,
+        res,
+        `user ${user.email} deleted successfully`
+      );
     } catch (error) {
       logger.error(error);
       logger.error(error.stack);

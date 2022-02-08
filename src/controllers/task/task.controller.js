@@ -61,17 +61,6 @@ module.exports = {
       const value = await taskUpdate.validateAsync(req.body);
 
       let oauth = res.locals.oauth.token;
-      let {
-        taskName,
-        categoryName,
-        description,
-        priority,
-        dueDate,
-        addToMyDay,
-        status,
-        tags,
-        subtasks,
-      } = value;
 
       const task = await Task.findOne({
         where: {
@@ -102,7 +91,7 @@ module.exports = {
         //create tags
 
         const newCategory = await Category.findOne({
-          name: categoryName,
+          name: value.categoryName,
           userId: oauth.user.id,
         });
 

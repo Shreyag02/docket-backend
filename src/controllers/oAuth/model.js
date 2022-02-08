@@ -1,36 +1,3 @@
-//   saveToken: async (token, client, user) => {
-//     try {
-//       const payload = {
-//         accessToken: token.accessToken,
-//         expiresIn: token.accessTokenExpiresAt,
-//         refreshToken: token.refreshToken,
-//         refreshTokenExpiresIn: token.refreshTokenExpiresAt,
-//         scope: token.scope,
-//         tokenType: "Bearer",
-//         clientId: client.id,
-//         userId: user.id,
-//       };
-
-//       await Token.create(payload);
-
-//       return {
-//         accessToken: token.accessToken,
-//         accessTokenExpiresAt: token.accessTokenExpiresAt,
-//         refreshToken: token.refreshToken,
-//         scope: token.scope,
-//         client: { id: client.clientId },
-//         user: { id: user.userId },
-//       };
-//     } catch (error) {
-//       logger.error(error);
-//       logger.error(error.stack);
-
-//       return false;
-//     }
-//   },
-
-// };
-
 const { Client, User, Token } = require("../../models");
 const bcrypt = require("bcrypt");
 
@@ -141,7 +108,7 @@ module.exports = {
     }
   },
 
-  validateScope: (user, client, scope) => {
+  validateScope: async (user, client, scope) => {
     try {
       if (!scope.split(" ").every((s) => VALID_SCOPES.indexOf(s) >= 0)) {
         throw new DataForbiddenError("Invalid scopes");
