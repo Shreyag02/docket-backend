@@ -36,10 +36,5 @@ module.exports = {
       )
       .required()
       .error(new Error("password is not valid")),
-
-    email: Joi.string()
-      .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
-      .error(new Error("email is not valid"))
-      .required(),
   }),
 };

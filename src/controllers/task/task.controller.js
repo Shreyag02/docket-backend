@@ -3,7 +3,13 @@ const { v4: uuidv4 } = require("uuid");
 
 const { successResponse, errorResponse } = require("../../utilities/helper");
 
-const { taskRegister } = require("../../utilities/validations/task");
+const logger = require("../../services/loggerService");
+
+const {
+  taskRegister,
+  taskUpdate,
+} = require("../../utilities/validations/task");
+
 const { DataNotFoundError } = require("../../utilities/views/errorResponse");
 
 module.exports = {
@@ -52,12 +58,26 @@ module.exports = {
 
   update: async (req, res) => {
     try {
+      const value = await taskUpdate.validateAsync(req.body);
+
       let oauth = res.locals.oauth.token;
+      let {
+        taskName,
+        categoryName,
+        description,
+        priority,
+        dueDate,
+        addToMyDay,
+        status,
+        tags,
+        subtasks,
+      } = value;
 
       const task = await Task.findOne({
         where: {
-          id: req.body.taskId,
+          id: req.params.id,
           userId: oauth.user.id,
+          archivedAt: null,
         },
       });
 
@@ -67,12 +87,12 @@ module.exports = {
         let newCategoryId = null;
 
         //update subtasks
-        if (req.body.subtasks) {
-          req.body.subtasks?.map((subtask) => {
+        if (value.subtasks) {
+          value.subtasks?.map((subtask) => {
             const payload = {
               id: uuidv4(),
               name: subtask?.subtaskName,
-              taskId: req.body.taskId,
+              taskId: req.params.id,
               status: subtask?.status || "pending",
             };
 
@@ -81,28 +101,27 @@ module.exports = {
         }
         //create tags
 
-        if (req.body.categoryName) {
-          const newCategory = await Category.findOne({
-            name: categoryName,
-            userId: oauth.user.id,
-          });
+        const newCategory = await Category.findOne({
+          name: categoryName,
+          userId: oauth.user.id,
+        });
 
-          if (!newCategory) {
-            throw new DataNotFoundError("Category does not exist");
-          } else newCategoryId = newCategory.id;
-        }
+        if (!newCategory) {
+          throw new DataNotFoundError("Category does not exist");
+        } else newCategoryId = newCategory.id;
 
         await Task.update(
           {
-            name: req.body.taskName || task.name,
-            categoryId: newCategoryId || task.categoryId,
-            dueDate: req.body.dueDate || task.dueDate,
-            addToMyDay: req.body.addToMyDay || task.addToMyDay,
-            status: req.body.status || task.status,
+            name: value.taskName,
+            categoryId: newCategoryId,
+            description: value.description,
+            dueDate: value.dueDate,
+            addToMyDay: value.addToMyDay,
+            status: value.status,
           },
           {
             where: {
-              id: req.body.taskId,
+              id: req.params.id,
               userId: oauth.user.id,
             },
           }

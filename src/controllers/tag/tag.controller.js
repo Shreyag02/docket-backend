@@ -3,6 +3,8 @@ const { v4: uuidv4 } = require("uuid");
 
 const { successResponse, errorResponse } = require("../../utilities/helper");
 
+const logger = require("../../services/loggerService");
+
 const { tagRegister } = require("../../utilities/validations/tag");
 const {
   DataDuplicateError,

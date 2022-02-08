@@ -5,6 +5,8 @@ const {
   generateRandomId,
 } = require("../../utilities/helper");
 
+const logger = require("../../services/loggerService");
+
 const { clientRegister } = require("../../utilities/validations/client");
 const {
   DataDuplicateError,

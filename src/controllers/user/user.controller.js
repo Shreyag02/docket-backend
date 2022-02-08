@@ -95,11 +95,12 @@ module.exports = {
     try {
       const value = await userLoginDel.validateAsync(req.body);
 
-      let { email, password } = value;
+      let { password } = value;
+      let oauth = res.locals.oauth.token;
 
       const user = await User.findOne({
         where: {
-          email,
+          id: oauth.user.id,
           archivedAt: null,
         },
       });
@@ -124,7 +125,7 @@ module.exports = {
           },
           {
             where: {
-              email,
+              id: oauth.user.id,
             },
           }
         );
