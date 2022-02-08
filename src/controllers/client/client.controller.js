@@ -96,7 +96,11 @@ module.exports = {
           }
         );
       }
-      return successResponse(req, res, client);
+      return successResponse(
+        req,
+        res,
+        `client ${client.clientName} deleted successfully`
+      );
     } catch (error) {
       logger.error(error);
       logger.error(error.stack);

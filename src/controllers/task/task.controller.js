@@ -165,7 +165,11 @@ module.exports = {
         );
       }
 
-      return successResponse(req, res, task);
+      return successResponse(
+        req,
+        res,
+        `task ${task.taskName} deleted successfully`
+      );
     } catch (error) {
       logger.error(error);
       logger.error(error.stack);

@@ -97,7 +97,11 @@ module.exports = {
         }
       );
 
-      return successResponse(req, res, category);
+      return successResponse(
+        req,
+        res,
+        ` ${category.name} deleted successfully`
+      );
     } catch (error) {
       logger.error(error);
       logger.error(error.stack);

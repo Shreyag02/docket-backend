@@ -76,7 +76,7 @@ module.exports = {
         );
       }
 
-      return successResponse(req, res, tag);
+      return successResponse(req, res, `${tag.tagName} deleted successfully`);
     } catch (error) {
       logger.error(error);
       logger.error(error.stack);
