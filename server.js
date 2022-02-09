@@ -44,10 +44,10 @@ app.use(
 
 try {
   db.sequelize.authenticate();
-  console.log("Connection has been established successfully.");
+  logger.info("Connection has been established successfully.");
 } catch (error) {
-  console.log(error.stack);
-  console.error("Unable to connect to the database:", error);
+  logger.info(error.stack);
+  logger.error("Unable to connect to the database:", error);
 }
 
-app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
+app.listen(PORT, () => logger.info(`Listening on port: ${PORT}`));

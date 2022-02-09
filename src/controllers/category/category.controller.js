@@ -14,6 +14,8 @@ const loggerService = require("../../services/loggerService");
 
 module.exports = {
   create: async (req, res) => {
+    logger.info("category create route is accessed");
+
     try {
       const value = await categoryRegister.validateAsync(req.body);
 
@@ -50,6 +52,8 @@ module.exports = {
   },
 
   get: async (req, res) => {
+    logger.info("category get route is accessed");
+
     try {
       let oauth = res.locals.oauth.token;
 
@@ -70,6 +74,8 @@ module.exports = {
   },
 
   delete: async (req, res) => {
+    logger.info("category delete route is accessed");
+
     try {
       let oauth = res.locals.oauth.token;
 
@@ -111,6 +117,8 @@ module.exports = {
   },
 
   getTasks: async (req, res) => {
+    logger.info("get category tasks route is accessed");
+
     try {
       let oauth = res.locals.oauth.token;
 
@@ -123,6 +131,10 @@ module.exports = {
         include: {
           model: Task,
           as: "tasks",
+          reuired: false,
+          where: {
+            archivedAt: null,
+          },
         },
       });
 

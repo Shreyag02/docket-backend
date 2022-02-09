@@ -13,6 +13,8 @@ const {
 
 module.exports = {
   create: async (req, res) => {
+    logger.info("tag create route is accessed");
+
     try {
       const value = await tagRegister.validateAsync(req.body);
 
@@ -49,6 +51,8 @@ module.exports = {
   },
 
   delete: async (req, res) => {
+    logger.info("tag delete route is accessed");
+
     try {
       let oauth = res.locals.oauth.token;
 
@@ -86,6 +90,8 @@ module.exports = {
   },
 
   get: async (req, res) => {
+    logger.info("tag get route is accessed");
+
     try {
       let oauth = res.locals.oauth.token;
 
@@ -106,6 +112,8 @@ module.exports = {
   },
 
   getTasks: async (req, res) => {
+    logger.info("tag get tasks route is accessed");
+
     try {
       let oauth = res.locals.oauth.token;
 
@@ -118,6 +126,10 @@ module.exports = {
         include: {
           model: Task,
           as: "tasks",
+          required: false,
+          where: {
+            archivedAt: null,
+          },
         },
       });
 

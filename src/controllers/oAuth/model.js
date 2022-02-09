@@ -12,6 +12,8 @@ const VALID_SCOPES = ["read", "write"];
 
 module.exports = {
   getClient: async (clientId, clientSecret) => {
+    logger.info("getClient route is accessed");
+
     try {
       const client = await Client.findOne({
         where: {
@@ -42,6 +44,8 @@ module.exports = {
   },
 
   getUser: async (username, password) => {
+    logger.info("get user route is accessed");
+
     try {
       const user = await User.findOne({
         where: {
@@ -78,6 +82,8 @@ module.exports = {
   },
 
   saveToken: async (token, client, user) => {
+    logger.info("save token route is accessed");
+
     try {
       const payload = {
         accessToken: token.accessToken,
@@ -109,6 +115,8 @@ module.exports = {
   },
 
   validateScope: async (user, client, scope) => {
+    logger.info("validate route is accessed");
+
     try {
       if (!scope.split(" ").every((s) => VALID_SCOPES.indexOf(s) >= 0)) {
         throw new DataForbiddenError("Invalid scopes");
@@ -123,6 +131,8 @@ module.exports = {
   },
 
   revokeToken: async (token) => {
+    logger.info("revokeToken route is accessed");
+
     try {
       const tokenItem = await Token.findOne({
         where: { refreshToken: token.refreshToken, archivedAt: null },
@@ -152,6 +162,8 @@ module.exports = {
   },
 
   getRefreshToken: async (refreshToken) => {
+    logger.info("getRefresh token route is accessed");
+
     try {
       const tokenItem = await Token.findOne({
         where: {
@@ -162,10 +174,18 @@ module.exports = {
           {
             model: User,
             as: "user",
+            required: false,
+            where: {
+              archivedAt: null,
+            },
           },
           {
             model: Client,
             as: "client",
+            required: false,
+            where: {
+              archivedAt: null,
+            },
           },
         ],
       });
@@ -190,6 +210,8 @@ module.exports = {
   },
 
   getAccessToken: async (accessToken) => {
+    logger.info("get access token route is accessed");
+
     try {
       const tokenItem = await Token.findOne({
         where: {
@@ -200,10 +222,18 @@ module.exports = {
           {
             model: User,
             as: "user",
+            required: false,
+            where: {
+              archivedAt: null,
+            },
           },
           {
             model: Client,
             as: "client",
+            required: false,
+            where: {
+              archivedAt: null,
+            },
           },
         ],
       });

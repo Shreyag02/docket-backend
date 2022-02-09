@@ -24,6 +24,7 @@ const {
 module.exports = {
   register: async (req, res) => {
     logger.info("user register route is accessed");
+
     try {
       const value = await userRegister.validateAsync(req.body);
 
@@ -59,6 +60,8 @@ module.exports = {
   },
 
   login: async (req, res) => {
+    logger.info("user login route is accessed");
+
     try {
       const value = await userLoginDel.validateAsync(req.body);
 
@@ -92,6 +95,8 @@ module.exports = {
   },
 
   delete: async (req, res) => {
+    logger.info("user delete route is accessed");
+
     try {
       const value = await userLoginDel.validateAsync(req.body);
 

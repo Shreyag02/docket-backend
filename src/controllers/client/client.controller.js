@@ -15,6 +15,8 @@ const {
 
 module.exports = {
   register: async (req, res) => {
+    logger.info("client register route is accessed");
+
     try {
       const value = await clientRegister.validateAsync(req.body);
 
@@ -47,6 +49,8 @@ module.exports = {
   },
 
   getClient: async (req, res) => {
+    logger.info("get client route is accessed");
+
     try {
       const value = await clientRegister.validateAsync(req.body);
 
@@ -70,6 +74,8 @@ module.exports = {
   },
 
   delete: async (req, res) => {
+    logger.info("delete client route is accessed");
+
     try {
       const value = await clientRegister.validateAsync(req.body);
 

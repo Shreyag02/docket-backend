@@ -21,7 +21,7 @@ router.get("/categoryTasks/:id", categoryController.getTasks);
 router.delete("/deleteCategory/:id", categoryController.delete);
 
 router.post("/createTask", taskController.create);
-router.patch("/updateTask", taskController.update);
+router.patch("/updateTask/:id", taskController.update);
 router.get("/tasks/:id", taskController.get);
 router.get("/tasks", taskController.get);
 router.delete("/deleteTask/:id", taskController.delete);
