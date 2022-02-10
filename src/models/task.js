@@ -40,6 +40,8 @@ module.exports = (sequelize, DataTypes) => {
       description: DataTypes.STRING,
       priority: DataTypes.ENUM("urgent", "medium", "low"),
       dueDate: DataTypes.DATE,
+      reminderDate: DataTypes.DATE,
+      repeat: DataTypes.ENUM("daily", "monthly", "weekly", "yearly"),
       addToMyDay: DataTypes.DATE,
       status: DataTypes.ENUM("pending", "completed"),
       archivedAt: DataTypes.DATE,

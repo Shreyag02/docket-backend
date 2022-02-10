@@ -10,13 +10,13 @@ module.exports = {
     return hashSync(value, salt);
   },
 
-  successResponse: (req, res, data) => {
+  successResponse: (req, res, data, meta = null) => {
     logger.info("sending success response");
     console.log({
       data,
       error: null,
       success: true,
-      meta: null,
+      meta: meta,
     });
 
     return res.send({
@@ -40,7 +40,7 @@ module.exports = {
       meta: null,
     });
 
-    return res.status(data.code || 500).json({
+    res.status(data.code || 500).json({
       data: null,
       error: {
         errorCode: data.code || 500,
@@ -50,6 +50,7 @@ module.exports = {
       success: false,
       meta: null,
     });
+    return;
   },
 
   generateRandomId: (length) => {
@@ -83,5 +84,18 @@ module.exports = {
     console.log(array1.map((a) => a[key1]));
 
     return array1.map((a) => a[key1]);
+  },
+
+  arrayToObjectArray: (arr, key) => {
+    logger.info("converting array into array of objects");
+
+    let convertedArray = [];
+    arr.map((item) => {
+      convertedArray.push({
+        [key]: item,
+      });
+    });
+
+    return convertedArray;
   },
 };

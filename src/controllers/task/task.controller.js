@@ -5,6 +5,7 @@ const {
   successResponse,
   errorResponse,
   getDifference,
+  arrayToObjectArray,
 } = require("../../utilities/helper");
 
 const logger = require("../../services/loggerService");
@@ -35,8 +36,18 @@ module.exports = {
         },
       });
 
+      let testCategory;
+
+      //creating new category if category not found
       if (!category) {
-        throw new DataNotFoundError("Category not found");
+        const categoryPayload = {
+          id: uuidv4(),
+          name: categoryName,
+          userId: oauth.user.id,
+        };
+        Category.create(categoryPayload);
+
+        testCategory = categoryPayload;
       }
 
       let dueDate = new Date();
@@ -46,7 +57,7 @@ module.exports = {
         id: uuidv4(),
         name: taskName,
         userId: oauth.user.id,
-        categoryId: category.id,
+        categoryId: category ? category.id : testCategory.id,
         dueDate,
         addToMyDay,
         status: "pending",
@@ -101,7 +112,88 @@ module.exports = {
         throw new DataNotFoundError("Task not found");
       }
 
-      let newCategoryId = null;
+      const newTagObj = arrayToObjectArray(value.tags, "tagName");
+
+      const newCategory = await Category.findOne({
+        where: {
+          name: value.categoryName,
+          userId: oauth.user.id,
+          archivedAt: null,
+        },
+      });
+
+      if (!newCategory) {
+        throw new DataNotFoundError("Please choose existing category");
+      }
+
+      //updating tags
+
+      //getting oldtags that are not present in the new array of tags
+
+      const diffTags = getDifference(task.tags, newTagObj, "name", "tagName");
+      const tagCollection = await Tag.findAll({
+        where: {
+          name: {
+            [Op.in]: diffTags,
+          },
+          userId: oauth.user.id,
+          archivedAt: null,
+        },
+      });
+
+      tagCollection.map(async (oldTag) => {
+        await TaskTag.destroy({
+          where: {
+            tagId: oldTag.id,
+            taskId: req.params.id,
+          },
+        });
+      });
+
+      //iterating the new array of tags and creating and updating accordingly
+
+      const newAddedTags = getDifference(
+        newTagObj,
+        task.tags,
+        "tagName",
+        "name"
+      );
+
+      newAddedTags.map(async (tag) => {
+        let checkTag = await Tag.findOne({
+          where: {
+            name: tag,
+            userId: oauth.user.id,
+            archivedAt: null,
+          },
+        });
+
+        // let testCheckTag;
+
+        if (!checkTag) {
+          const tagPayload = {
+            id: uuidv4(),
+            name: tag,
+            userId: oauth.user.id,
+          };
+
+          const newTag = await Tag.create(tagPayload);
+
+          const payload = {
+            taskId: req.params.id,
+            tagId: newTag.id,
+          };
+
+          TaskTag.create(payload);
+        } else {
+          const payload = {
+            taskId: req.params.id,
+            tagId: checkTag.id,
+          };
+
+          TaskTag.create(payload);
+        }
+      });
 
       //update subtasks
 
@@ -113,9 +205,6 @@ module.exports = {
         "id",
         "id"
       );
-
-      logger.info("iam difference in subtask");
-      console.log(diffSubtasks);
 
       await Subtask.update(
         {
@@ -151,12 +240,6 @@ module.exports = {
             },
           });
 
-          if (!updatedSubtask) {
-            logger.info("Subtask not found");
-
-            // throw new DataNotFoundError(`invalid subtask ${subtask.id}`);
-          }
-
           await Subtask.update(
             {
               name: subtask.subtaskName,
@@ -172,106 +255,15 @@ module.exports = {
         }
       });
 
-      //updating tags
-
-      //getting oldtags that are not present in the new array of tags
-      const diffTags = getDifference(task.tags, value.tags, "name", "tagName");
-
-      logger.info("i am difference in tags");
-      console.log(diffTags);
-
-      // await TaskTag.destroy({
-      //   where: {
-      //     tagId: {
-      //       [Op.in]: diffTags,
-      //     },
-      //     taskId: req.params.id,
-      //   },
-      //   include:[
-      //     {
-      //       model:
-      //     }
-      //   ]
-      // });
-
-      //iterating the new array of tags and creating and updating accordingly
-
-      const newAddedTags = getDifference(
-        value.tags,
-        task.tags,
-        "tagName",
-        "name"
-      );
-
-      logger.info("iam newly afded in tags");
-      console.log(newAddedTags);
-
-      newAddedTags.map(async (tag) => {
-        logger.info("mapping newlyadded tags");
-        let checkTag = null;
-        checkTag = await Tag.findOne({
-          where: {
-            name: tag,
-            userId: oauth.user.id,
-            archivedAt: null,
-          },
-        });
-
-        console.log("ia am checktag", checkTag);
-
-        if (checkTag) {
-          logger.info("CHECK TAG EXIST");
-
-          const payload = {
-            taskId: req.params.id,
-            tagId: checkTag.id,
-          };
-
-          TaskTag.create(payload);
-        } else {
-          logger.info("in create function");
-
-          const tagPayload = {
-            id: uuidv4(),
-            name: tag,
-            userId: oauth.user.id,
-          };
-
-          Tag.create(tagPayload);
-          console.log("241", tagPayload);
-
-          let tagTaskpayload = null;
-          tagTaskpayload = {
-            taskId: req.params.id,
-            tagId: tagPayload.id,
-          };
-
-          TaskTag.create(tagTaskpayload);
-
-          logger.info("created checktag");
-          console.log({ checkTag });
-        }
-      });
-
-      const newCategory = await Category.findOne({
-        where: {
-          name: value.categoryName,
-          userId: oauth.user.id,
-          archivedAt: null,
-        },
-      });
-
-      if (!newCategory) {
-        throw new DataNotFoundError("Category does not exist");
-      }
-      newCategoryId = newCategory.id;
-
       await Task.update(
         {
           name: value.taskName,
-          categoryId: newCategoryId,
+          categoryId: newCategory.id,
           description: value.description,
+          priority: value.priority,
           dueDate: value.dueDate,
+          reminderDate: value.reminderDate,
+          repeat: value.repeat,
           addToMyDay: value.addToMyDay,
           status: value.status,
         },
@@ -283,11 +275,43 @@ module.exports = {
         }
       );
 
-      return successResponse(
-        req,
-        res,
-        `${task.name} with id:${req.params.id} updated successfully`
-      );
+      const updatedTask = await Task.findOne({
+        where: {
+          id: req.params.id,
+          userId: oauth.user.id,
+          archivedAt: null,
+        },
+      });
+
+      const updatedSubtasks = await Subtask.findAll({
+        where: {
+          taskId: updatedTask.id,
+          archivedAt: null,
+        },
+        attributes: ["id", "name", "status"],
+      });
+
+      const updatedTags = await Tag.findAll({
+        where: {
+          userId: oauth.user.id,
+          archivedAt: null,
+        },
+        include: {
+          model: Task,
+          as: "tasks",
+          where: {
+            id: updatedTask.id,
+            archivedAt: null,
+          },
+          attributes: ["id", "name"],
+        },
+      });
+
+      const temp = updatedTask.dataValues;
+      temp["subtasks"] = updatedSubtasks;
+      temp["tags"] = updatedTags;
+
+      return successResponse(req, res, temp);
     } catch (error) {
       logger.error(error);
       logger.error(error.stack);
@@ -380,6 +404,7 @@ module.exports = {
             where: {
               archivedAt: null,
             },
+            attributes: ["id", "name", "status"],
           },
           {
             model: Tag,
@@ -388,6 +413,7 @@ module.exports = {
             where: {
               archivedAt: null,
             },
+            attributes: ["id", "name"],
           },
         ],
       });

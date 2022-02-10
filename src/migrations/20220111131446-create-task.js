@@ -41,6 +41,15 @@ module.exports = {
         type: Sequelize.DATE,
         field: "due_date",
       },
+      reminderDate: {
+        allowNull: true,
+        type: Sequelize.DATE,
+        field: "reminder_date",
+      },
+      repeat: {
+        allowNull: true,
+        type: Sequelize.ENUM("daily", "monthly", "weekly", "yearly"),
+      },
       addToMyDay: {
         type: Sequelize.DATE,
         allowNull: true,
