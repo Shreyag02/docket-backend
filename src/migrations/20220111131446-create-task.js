@@ -58,6 +58,11 @@ module.exports = {
       status: {
         type: Sequelize.ENUM("pending", "completed"),
       },
+      totalTime: {
+        type: Sequelize.INTEGER,
+        field: "total_time",
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

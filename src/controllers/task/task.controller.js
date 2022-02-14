@@ -6,6 +6,7 @@ const {
   errorResponse,
   getDifference,
   arrayToObjectArray,
+  calcTaskTime,
 } = require("../../utilities/helper");
 
 const logger = require("../../services/loggerService");
@@ -16,6 +17,7 @@ const {
 } = require("../../utilities/validations/task");
 
 const { DataNotFoundError } = require("../../utilities/views/errorResponse");
+
 const { Op } = require("sequelize");
 
 module.exports = {
@@ -61,6 +63,7 @@ module.exports = {
         dueDate,
         addToMyDay,
         status: "pending",
+        totalTime: "0 min",
       };
 
       Task.create(payload);
@@ -221,29 +224,34 @@ module.exports = {
       );
 
       //iterating the new array of subtasks and creating and updating accordingly
+
       value.subtasks.map(async (subtask) => {
-        if (subtask.id === "") {
+        const updatedSubtask = await Subtask.findOne({
+          where: {
+            id: subtask.id,
+            taskId: req.params.id,
+            archivedAt: null,
+          },
+        });
+
+        if (!updatedSubtask) {
           const payload = {
             id: uuidv4(),
             name: subtask.subtaskName,
             taskId: req.params.id,
             status: subtask?.status || "pending",
+            startTime: subtask.startTime,
+            endTime: subtask.endTime,
           };
 
           Subtask.create(payload);
         } else {
-          const updatedSubtask = await Subtask.findOne({
-            where: {
-              id: subtask.id,
-              taskId: req.params.id,
-              archivedAt: null,
-            },
-          });
-
           await Subtask.update(
             {
               name: subtask.subtaskName,
               status: subtask.status,
+              startTime: subtask.startTime,
+              endTime: subtask.endTime,
             },
             {
               where: {
@@ -266,6 +274,7 @@ module.exports = {
           repeat: value.repeat,
           addToMyDay: value.addToMyDay,
           status: value.status,
+          totalTime: calcTaskTime(value.subtasks),
         },
         {
           where: {
@@ -281,14 +290,6 @@ module.exports = {
           userId: oauth.user.id,
           archivedAt: null,
         },
-      });
-
-      const updatedSubtasks = await Subtask.findAll({
-        where: {
-          taskId: updatedTask.id,
-          archivedAt: null,
-        },
-        attributes: ["id", "name", "status"],
       });
 
       const updatedTags = await Tag.findAll({
@@ -307,9 +308,20 @@ module.exports = {
         },
       });
 
+      const updatedSubtasks = await Subtask.findAll({
+        where: {
+          taskId: updatedTask.id,
+          archivedAt: null,
+        },
+        // attributes: ["id", "name", "status"],
+      });
+
+      console.log({ o: task.subtasks, updatedSubtasks });
+
       const temp = updatedTask.dataValues;
       temp["subtasks"] = updatedSubtasks;
       temp["tags"] = updatedTags;
+      // temp["totalTime"] = calcTaskTime(updatedSubtasks);
 
       return successResponse(req, res, temp);
     } catch (error) {
@@ -404,7 +416,7 @@ module.exports = {
             where: {
               archivedAt: null,
             },
-            attributes: ["id", "name", "status"],
+            // attributes: ["id", "name", "status"],
           },
           {
             model: Tag,

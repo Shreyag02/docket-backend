@@ -44,6 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       repeat: DataTypes.ENUM("daily", "monthly", "weekly", "yearly"),
       addToMyDay: DataTypes.DATE,
       status: DataTypes.ENUM("pending", "completed"),
+      totalTime: DataTypes.INTEGER,
       archivedAt: DataTypes.DATE,
     },
     {

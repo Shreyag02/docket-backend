@@ -98,4 +98,24 @@ module.exports = {
 
     return convertedArray;
   },
+
+  calcTaskTime: (subtaskArr) => {
+    console.log("subtask arrat", subtaskArr);
+    let hours = 0;
+    let minutes = 0;
+    subtaskArr.map((subtask) => {
+      console.log(subtask.startTime, subtask.endTime);
+      let startTime = subtask.startTime.split(":");
+      let endTime = subtask.endTime.split(":");
+
+      hours = hours + (endTime[0] - startTime[0]);
+      minutes = minutes + (endTime[1] - startTime[1]);
+    });
+
+    return hours * 60 + minutes;
+
+    // if (hours > 0 && minutes <= 0) return `${hours} hr`;
+    // else if (hours > 0 && minutes > 0) return `${hours} hr ${minutes} min`;
+    // else return `${minutes} min`;
+  },
 };

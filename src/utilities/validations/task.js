@@ -52,16 +52,6 @@ module.exports = {
         .max(30)
         .regex(/^\s*\w+(?:[^\w,]+\w+)*[^,\w]*$/)
     ),
-    // tags: Joi.array().items(
-    //   Joi.object({
-    //     id: Joi.string().uuid().allow(null, ""),
-    //     tagName: Joi.string()
-    //       .min(3)
-    //       .max(30)
-    //       .required()
-    //       .regex(/^\s*\w+(?:[^\w,]+\w+)*[^,\w]*$/),
-    //   })
-    // ),
 
     subtasks: Joi.array().items(
       Joi.object({
@@ -73,6 +63,14 @@ module.exports = {
           .regex(/^\s*\w+(?:[^\w,]+\w+)*[^,\w]*$/),
 
         status: Joi.string().valid("pending", "completed").required(),
+
+        startTime: Joi.string().regex(
+          /^(((([0-1][0-9])|(2[0-3])):?[0-5][0-9]:?[0-5][0-9]+$))/
+        ),
+
+        endTime: Joi.string().regex(
+          /^(((([0-1][0-9])|(2[0-3])):?[0-5][0-9]:?[0-5][0-9]+$))/
+        ),
       })
     ),
   }),

@@ -25,6 +25,8 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       taskId: DataTypes.UUID,
       status: DataTypes.ENUM("pending", "completed"),
+      startTime: DataTypes.TIME,
+      endTime: DataTypes.TIME,
       archivedAt: DataTypes.DATE,
     },
     {
