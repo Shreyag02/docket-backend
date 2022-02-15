@@ -10,7 +10,6 @@ const {
   DataNotFoundError,
   DataDuplicateError,
 } = require("../../utilities/views/errorResponse");
-const loggerService = require("../../services/loggerService");
 
 module.exports = {
   create: async (req, res) => {
@@ -62,6 +61,7 @@ module.exports = {
           userId: oauth.user.id,
           archivedAt: null,
         },
+        attributes: { exclude: ["archivedAt", "createdAt", "updatedAt"] },
       });
 
       return successResponse(req, res, categories);
@@ -93,7 +93,7 @@ module.exports = {
 
       await Category.update(
         {
-          archivedAt: new Date(),
+          archivedAt: new Date().toUTCString(),
         },
         {
           where: {
@@ -135,6 +135,7 @@ module.exports = {
           where: {
             archivedAt: null,
           },
+          attributes: { exclude: ["archivedAt", "createdAt", "updatedAt"] },
         },
       });
 

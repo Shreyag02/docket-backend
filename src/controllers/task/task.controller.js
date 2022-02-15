@@ -52,7 +52,7 @@ module.exports = {
         testCategory = categoryPayload;
       }
 
-      let dueDate = new Date();
+      let dueDate = addToMyDay ? new Date(addToMyDay) : new Date();
       dueDate.setDate(dueDate.getDate() + 1);
 
       const payload = {
@@ -60,10 +60,11 @@ module.exports = {
         name: taskName,
         userId: oauth.user.id,
         categoryId: category ? category.id : testCategory.id,
-        dueDate,
-        addToMyDay,
+        categoryName: category ? category.name : testCategory.name,
+        dueDate: dueDate.toUTCString(),
+        addToMyDay: addToMyDay?.toUTCString(),
         status: "pending",
-        totalTime: "0 min",
+        totalTime: 0,
       };
 
       Task.create(payload);
@@ -211,7 +212,7 @@ module.exports = {
 
       await Subtask.update(
         {
-          archivedAt: new Date(),
+          archivedAt: new Date().toUTCString(),
         },
         {
           where: {
@@ -267,12 +268,13 @@ module.exports = {
         {
           name: value.taskName,
           categoryId: newCategory.id,
+          categoryName: value.categoryName,
           description: value.description,
           priority: value.priority,
-          dueDate: value.dueDate,
-          reminderDate: value.reminderDate,
+          dueDate: value.dueDate.toUTCString(),
+          reminderDate: value.reminderDate.toUTCString(),
           repeat: value.repeat,
-          addToMyDay: value.addToMyDay,
+          addToMyDay: value.addToMyDay.toUTCString(),
           status: value.status,
           totalTime: calcTaskTime(value.subtasks),
         },
@@ -284,12 +286,19 @@ module.exports = {
         }
       );
 
+      console.log("test", {
+        dueDate: value.dueDate.toUTCString(),
+        reminderDate: value.reminderDate.toUTCString(),
+        addToMyDay: value.addToMyDay.toUTCString(),
+      });
+
       const updatedTask = await Task.findOne({
         where: {
           id: req.params.id,
           userId: oauth.user.id,
           archivedAt: null,
         },
+        attributes: { exclude: ["archivedAt", "createdAt", "updatedAt"] },
       });
 
       const updatedTags = await Tag.findAll({
@@ -306,6 +315,7 @@ module.exports = {
           },
           attributes: ["id", "name"],
         },
+        attributes: ["id", "name"],
       });
 
       const updatedSubtasks = await Subtask.findAll({
@@ -313,15 +323,14 @@ module.exports = {
           taskId: updatedTask.id,
           archivedAt: null,
         },
-        // attributes: ["id", "name", "status"],
+        attributes: {
+          exclude: ["archivedAt", "createdAt", "updatedAt", "taskId"],
+        },
       });
-
-      console.log({ o: task.subtasks, updatedSubtasks });
 
       const temp = updatedTask.dataValues;
       temp["subtasks"] = updatedSubtasks;
       temp["tags"] = updatedTags;
-      // temp["totalTime"] = calcTaskTime(updatedSubtasks);
 
       return successResponse(req, res, temp);
     } catch (error) {
@@ -351,7 +360,7 @@ module.exports = {
       } else {
         await Subtask.update(
           {
-            archivedAt: new Date(),
+            archivedAt: new Date().toUTCString(),
           },
           {
             where: {
@@ -368,7 +377,7 @@ module.exports = {
 
         await Task.update(
           {
-            archivedAt: new Date(),
+            archivedAt: new Date().toUTCString(),
           },
           {
             where: {
@@ -416,7 +425,9 @@ module.exports = {
             where: {
               archivedAt: null,
             },
-            // attributes: ["id", "name", "status"],
+            attributes: {
+              exclude: ["archivedAt", "createdAt", "updatedAt", "taskId"],
+            },
           },
           {
             model: Tag,
@@ -428,6 +439,9 @@ module.exports = {
             attributes: ["id", "name"],
           },
         ],
+        attributes: {
+          exclude: ["archivedAt", "createdAt", "updatedAt"],
+        },
       });
 
       return successResponse(req, res, tasks);

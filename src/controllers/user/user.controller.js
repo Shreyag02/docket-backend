@@ -50,7 +50,12 @@ module.exports = {
 
       User.create(payload);
 
-      return successResponse(req, res, payload);
+      return successResponse(req, res, {
+        id: payload.id,
+        email: payload.email,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+      });
     } catch (error) {
       logger.error(error);
       logger.error(error.stack);
@@ -69,6 +74,7 @@ module.exports = {
 
       const user = await User.findOne({
         where: { email, archivedAt: null },
+        exclude: ["archivedAt", "createdAt", "updatedAt"],
       });
 
       if (!user) {
@@ -125,7 +131,7 @@ module.exports = {
 
       await User.update(
         {
-          archivedAt: new Date(),
+          archivedAt: new Date().toUTCString(),
         },
         {
           where: {

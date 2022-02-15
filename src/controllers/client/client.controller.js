@@ -93,7 +93,7 @@ module.exports = {
       } else {
         await Client.update(
           {
-            archivedAt: new Date(),
+            archivedAt: new Date().toUTCString(),
           },
           {
             where: {

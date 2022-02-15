@@ -37,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       userId: DataTypes.UUID,
       categoryId: DataTypes.UUID,
+      categoryName: DataTypes.STRING,
       description: DataTypes.STRING,
       priority: DataTypes.ENUM("urgent", "medium", "low"),
       dueDate: DataTypes.DATE,

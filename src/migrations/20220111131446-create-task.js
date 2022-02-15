@@ -29,6 +29,11 @@ module.exports = {
           key: "id",
         },
       },
+      categoryName: {
+        allowNull: true,
+        type: Sequelize.STRING,
+        field: "category_name",
+      },
       description: {
         allowNull: true,
         type: Sequelize.STRING,

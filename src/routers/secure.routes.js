@@ -5,6 +5,7 @@ const categoryController = require("../controllers/category/category.controller"
 const tagController = require("../controllers/tag/tag.controller");
 
 const taskController = require("../controllers/task/task.controller");
+const analyticsController = require("../controllers/analytics/analytics.controller");
 
 const router = require("express").Router();
 
@@ -25,5 +26,7 @@ router.put("/updateTask/:id", taskController.update);
 router.get("/tasks/:id", taskController.get);
 router.get("/tasks", taskController.get);
 router.delete("/deleteTask/:id", taskController.delete);
+
+router.get("/taskSuccess", analyticsController.getTaskSuccess);
 
 module.exports = router;
