@@ -2,7 +2,7 @@ const Joi = require("joi");
 
 module.exports = {
   taskRegister: Joi.object({
-    taskName: Joi.string()
+    name: Joi.string()
       .min(3)
       .max(30)
       .required()
@@ -17,8 +17,12 @@ module.exports = {
     addToMyDay: Joi.date(),
   }),
 
+  taskStatusUpdate: Joi.object({
+    status: Joi.string().valid("pending", "completed").required(),
+  }),
+
   taskUpdate: Joi.object({
-    taskName: Joi.string()
+    name: Joi.string()
       .min(3)
       .max(30)
       .required()
@@ -55,8 +59,8 @@ module.exports = {
 
     subtasks: Joi.array().items(
       Joi.object({
-        id: Joi.string().uuid().allow(null, ""),
-        subtaskName: Joi.string()
+        id: Joi.string().allow(null, ""),
+        name: Joi.string()
           .min(3)
           .max(30)
           .required()

@@ -14,6 +14,7 @@ const logger = require("../../services/loggerService");
 const {
   taskRegister,
   taskUpdate,
+  taskStatusUpdate,
 } = require("../../utilities/validations/task");
 
 const { DataNotFoundError } = require("../../utilities/views/errorResponse");
@@ -28,7 +29,7 @@ module.exports = {
       const value = await taskRegister.validateAsync(req.body);
 
       let oauth = res.locals.oauth.token;
-      let { taskName, categoryName, addToMyDay } = value;
+      let { name, categoryName, addToMyDay } = value;
 
       const category = await Category.findOne({
         where: {
@@ -57,11 +58,12 @@ module.exports = {
 
       const payload = {
         id: uuidv4(),
-        name: taskName,
+        name: name,
         userId: oauth.user.id,
         categoryId: category ? category.id : testCategory.id,
         categoryName: category ? category.name : testCategory.name,
         dueDate: dueDate.toUTCString(),
+        reminderDate: dueDate.toUTCString(),
         addToMyDay: addToMyDay?.toUTCString(),
         status: "pending",
         totalTime: 0,
@@ -238,7 +240,7 @@ module.exports = {
         if (!updatedSubtask) {
           const payload = {
             id: uuidv4(),
-            name: subtask.subtaskName,
+            name: subtask.name,
             taskId: req.params.id,
             status: subtask?.status || "pending",
             startTime: subtask.startTime,
@@ -249,7 +251,7 @@ module.exports = {
         } else {
           await Subtask.update(
             {
-              name: subtask.subtaskName,
+              name: subtask.name,
               status: subtask.status,
               startTime: subtask.startTime,
               endTime: subtask.endTime,
@@ -266,7 +268,7 @@ module.exports = {
 
       await Task.update(
         {
-          name: value.taskName,
+          name: value.name,
           categoryId: newCategory.id,
           categoryName: value.categoryName,
           description: value.description,
@@ -333,6 +335,50 @@ module.exports = {
       temp["tags"] = updatedTags;
 
       return successResponse(req, res, temp);
+    } catch (error) {
+      logger.error(error);
+      logger.error(error.stack);
+
+      return errorResponse(req, res, error.message, error);
+    }
+  },
+
+  updateStatus: async (req, res) => {
+    logger.info("task status route is accessed");
+
+    try {
+      let oauth = res.locals.oauth.token;
+      const value = await taskStatusUpdate.validateAsync(req.body);
+
+      const task = await Task.findOne({
+        where: {
+          id: req.params.id,
+          userId: oauth.user.id,
+          archivedAt: null,
+        },
+      });
+
+      if (!task) {
+        throw new DataNotFoundError("Task not found");
+      } else {
+        await Task.update(
+          {
+            status: value.status,
+          },
+          {
+            where: {
+              id: req.params.id,
+              userId: oauth.user.id,
+            },
+          }
+        );
+      }
+
+      return successResponse(
+        req,
+        res,
+        `${task.name} status updated successfully`
+      );
     } catch (error) {
       logger.error(error);
       logger.error(error.stack);
