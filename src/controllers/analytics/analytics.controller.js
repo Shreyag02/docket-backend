@@ -110,4 +110,62 @@ module.exports = {
       return errorResponse(req, res, error.message);
     }
   },
+
+  getCategoryTime: async (req, res) => {
+    logger.info("get category time route is accessed");
+
+    try {
+      let oauth = res.locals.oauth.token;
+
+      let startDate = new Date(req.body.startDate);
+      let endDate = new Date(req.body.endDate);
+      endDate.setDate(endDate.getDate() + 1);
+
+      const categories = await Category.findAll({
+        where: {
+          userId: oauth.user.id,
+          archivedAt: null,
+        },
+        include: {
+          model: Task,
+          as: "tasks",
+          where: {
+            archivedAt: null,
+            createdAt: {
+              [Op.gte]: startDate,
+              [Op.lte]: endDate,
+            },
+          },
+        },
+      });
+
+      console.log({
+        startDate,
+        endDate,
+      });
+
+      let response = [];
+
+      categories.map((category) => {
+        let tTime = 0;
+
+        category.tasks.map((task) => {
+          tTime = tTime + task.totalTime;
+        });
+
+        response.push({
+          id: category.id,
+          categoryName: category.name,
+          time: tTime,
+        });
+      });
+
+      return successResponse(req, res, response);
+    } catch (error) {
+      logger.error(error);
+      logger.error(error.stack);
+
+      return errorResponse(req, res, error.message);
+    }
+  },
 };

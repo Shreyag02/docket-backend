@@ -29,5 +29,6 @@ router.get("/tasks", taskController.get);
 router.delete("/deleteTask/:id", taskController.delete);
 
 router.get("/taskSuccess", analyticsController.getTaskSuccess);
+router.get("/categoryTime", analyticsController.getCategoryTime);
 
 module.exports = router;
