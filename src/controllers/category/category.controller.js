@@ -46,7 +46,7 @@ module.exports = {
       logger.error(error);
       logger.error(error.stack);
 
-      return errorResponse(req, res, error.message);
+      return errorResponse(req, res, error.message, error);
     }
   },
 

@@ -5,7 +5,6 @@ const {
   successResponse,
   errorResponse,
   getDifference,
-  arrayToObjectArray,
   calcTaskTime,
 } = require("../../utilities/helper");
 
@@ -117,8 +116,6 @@ module.exports = {
         throw new DataNotFoundError("Task not found");
       }
 
-      const newTagObj = arrayToObjectArray(value.tags, "tagName");
-
       const newCategory = await Category.findOne({
         where: {
           name: value.categoryName,
@@ -135,7 +132,7 @@ module.exports = {
 
       //getting oldtags that are not present in the new array of tags
 
-      const diffTags = getDifference(task.tags, newTagObj, "name", "tagName");
+      const diffTags = getDifference(task.tags, value.tags, "name", "name");
       const tagCollection = await Tag.findAll({
         where: {
           name: {
@@ -157,12 +154,7 @@ module.exports = {
 
       //iterating the new array of tags and creating and updating accordingly
 
-      const newAddedTags = getDifference(
-        newTagObj,
-        task.tags,
-        "tagName",
-        "name"
-      );
+      const newAddedTags = getDifference(value.tags, task.tags, "name", "name");
 
       newAddedTags.map(async (tag) => {
         let checkTag = await Tag.findOne({
@@ -172,8 +164,6 @@ module.exports = {
             archivedAt: null,
           },
         });
-
-        // let testCheckTag;
 
         if (!checkTag) {
           const tagPayload = {
@@ -308,9 +298,9 @@ module.exports = {
             id: updatedTask.id,
             archivedAt: null,
           },
-          attributes: ["id", "name"],
+          attributes: [],
         },
-        attributes: ["id", "name"],
+        attributes: ["name"],
       });
 
       const updatedSubtasks = await Subtask.findAll({
@@ -475,7 +465,16 @@ module.exports = {
             where: {
               archivedAt: null,
             },
-            attributes: ["id", "name"],
+            attributes: {
+              exclude: [
+                "archivedAt",
+                "createdAt",
+                "updatedAt",
+                "userId",
+                "id",
+                "task_tags",
+              ],
+            },
           },
         ],
         attributes: {

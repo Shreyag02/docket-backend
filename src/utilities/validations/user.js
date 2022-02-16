@@ -2,9 +2,9 @@ const Joi = require("joi");
 
 module.exports = {
   userRegister: Joi.object({
-    firstName: Joi.string().alphanum().min(3).max(30).required(),
+    firstName: Joi.string().alphanum().required(),
 
-    lastName: Joi.string().alphanum().min(3).max(30).required(),
+    lastName: Joi.string().alphanum().required(),
 
     //atleast 1 number [0-9]
     //atleast 1 capital alphabet [A-Z]

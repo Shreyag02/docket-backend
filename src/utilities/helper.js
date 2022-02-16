@@ -24,6 +24,11 @@ module.exports = {
   errorResponse: (req, res, errorMessage = "Something went wrong", data) => {
     logger.error("sending error response");
 
+    if (data.name === "ValidationError") {
+      data.code = "409";
+      data.status = "CONFLICT";
+    }
+
     res.status(data.code || 500).json({
       data: null,
       error: {
