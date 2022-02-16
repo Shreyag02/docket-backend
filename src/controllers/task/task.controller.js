@@ -23,7 +23,7 @@ const { Op } = require("sequelize");
 
 module.exports = {
   create: async (req, res) => {
-    logger.info("task create route is accessed");
+    logger.info(`${req.url} route is accessed with method ${req.method}`);
 
     try {
       const value = await taskRegister.validateAsync(req.body);
@@ -81,8 +81,7 @@ module.exports = {
   },
 
   update: async (req, res) => {
-    logger.info("task update route is accessed");
-
+    logger.info(`${req.url} route is accessed with method ${req.method}`);
     try {
       const value = await taskUpdate.validateAsync(req.body);
 
@@ -288,12 +287,6 @@ module.exports = {
         }
       );
 
-      console.log("test", {
-        dueDate: value.dueDate.toUTCString(),
-        reminderDate: value.reminderDate.toUTCString(),
-        addToMyDay: value.addToMyDay.toUTCString(),
-      });
-
       const updatedTask = await Task.findOne({
         where: {
           id: req.params.id,
@@ -344,7 +337,7 @@ module.exports = {
   },
 
   updateStatus: async (req, res) => {
-    logger.info("task status route is accessed");
+    logger.info(`${req.url} route is accessed with method ${req.method}`);
 
     try {
       let oauth = res.locals.oauth.token;
@@ -388,7 +381,7 @@ module.exports = {
   },
 
   delete: async (req, res) => {
-    logger.info("task delete route is accessed");
+    logger.info(`${req.url} route is accessed with method ${req.method}`);
 
     try {
       let oauth = res.locals.oauth.token;
@@ -444,7 +437,7 @@ module.exports = {
   },
 
   get: async (req, res) => {
-    logger.info("task get route is accessed");
+    logger.info(`${req.url} route is accessed with method ${req.method}`);
 
     try {
       let oauth = res.locals.oauth.token;

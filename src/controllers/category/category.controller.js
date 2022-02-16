@@ -13,7 +13,7 @@ const {
 
 module.exports = {
   create: async (req, res) => {
-    logger.info("category create route is accessed");
+    logger.info(`${req.url} route is accessed with method ${req.method}`);
 
     try {
       const value = await categoryRegister.validateAsync(req.body);
@@ -51,7 +51,7 @@ module.exports = {
   },
 
   get: async (req, res) => {
-    logger.info("category get route is accessed");
+    logger.info(`${req.url} route is accessed with method ${req.method}`);
 
     try {
       let oauth = res.locals.oauth.token;
@@ -74,7 +74,7 @@ module.exports = {
   },
 
   delete: async (req, res) => {
-    logger.info("category delete route is accessed");
+    logger.info(`${req.url} route is accessed with method ${req.method}`);
 
     try {
       let oauth = res.locals.oauth.token;
@@ -117,7 +117,7 @@ module.exports = {
   },
 
   getTasks: async (req, res) => {
-    logger.info("get category tasks route is accessed");
+    logger.info(`${req.url} route is accessed with method ${req.method}`);
 
     try {
       let oauth = res.locals.oauth.token;

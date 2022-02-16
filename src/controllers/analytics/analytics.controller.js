@@ -4,24 +4,22 @@ const { successResponse, errorResponse } = require("../../utilities/helper");
 
 const logger = require("../../services/loggerService");
 
-const {
-  DataNotFoundError,
-  DataDuplicateError,
-} = require("../../utilities/views/errorResponse");
-
 const { Op } = require("sequelize");
+const {
+  analyticsSuccess,
+  analyticsHours,
+} = require("../../utilities/validations/analytics");
 
 module.exports = {
   getTaskSuccess: async (req, res) => {
-    logger.info("get task success route is accessed");
+    logger.info(`${req.url} route is accessed with method ${req.method}`);
 
     try {
-      // const value = await taskSuccess
+      const value = await analyticsSuccess.validateAsync(req.body);
       let oauth = res.locals.oauth.token;
-      // const { startDate, endDate } = req.body;
 
-      let startDate = new Date(req.body.startDate);
-      let endDate = new Date(req.body.endDate);
+      let startDate = new Date(value.startDate);
+      let endDate = new Date(value.endDate);
       endDate.setDate(endDate.getDate() + 1);
 
       // let todayStart = new Date().setHours(0, 0, 0, 0);
@@ -65,10 +63,6 @@ module.exports = {
           status: "pending",
         },
       });
-      console.log({
-        startDate,
-        endDate,
-      });
 
       const completedTasks = await Task.findAndCountAll({
         where: {
@@ -81,8 +75,6 @@ module.exports = {
           status: "completed",
         },
       });
-
-      console.log({ pendingTasks, completedTasks });
 
       let successPercentage;
 
@@ -112,13 +104,14 @@ module.exports = {
   },
 
   getCategoryTime: async (req, res) => {
-    logger.info("get category time route is accessed");
+    logger.info(`${req.url} route is accessed with method ${req.method}`);
 
     try {
       let oauth = res.locals.oauth.token;
+      const value = await analyticsSuccess.validateAsync(req.body);
 
-      let startDate = new Date(req.body.startDate);
-      let endDate = new Date(req.body.endDate);
+      let startDate = new Date(value.startDate);
+      let endDate = new Date(value.endDate);
       endDate.setDate(endDate.getDate() + 1);
 
       const categories = await Category.findAll({
@@ -139,9 +132,58 @@ module.exports = {
         },
       });
 
-      console.log({
-        startDate,
-        endDate,
+      let response = [];
+
+      categories.map((category) => {
+        let tTime = 0;
+
+        category.tasks.map((task) => {
+          tTime = tTime + task.totalTime;
+        });
+
+        response.push({
+          id: category.id,
+          categoryName: category.name,
+          time: tTime,
+        });
+      });
+
+      return successResponse(req, res, response);
+    } catch (error) {
+      logger.error(error);
+      logger.error(error.stack);
+
+      return errorResponse(req, res, error.message);
+    }
+  },
+
+  getWorkingHoursBreakdown: async (req, res) => {
+    logger.info(`${req.url} route is accessed with method ${req.method}`);
+
+    try {
+      let oauth = res.locals.oauth.token;
+      const value = await analyticsHours.validateAsync(req.body);
+
+      let startDate = new Date(value.startDate);
+      let endDate = new Date(value.endDate);
+      endDate.setDate(endDate.getDate() + 1);
+
+      const categories = await Category.findAll({
+        where: {
+          userId: oauth.user.id,
+          archivedAt: null,
+        },
+        include: {
+          model: Task,
+          as: "tasks",
+          where: {
+            archivedAt: null,
+            createdAt: {
+              [Op.gte]: startDate,
+              [Op.lte]: endDate,
+            },
+          },
+        },
       });
 
       let response = [];

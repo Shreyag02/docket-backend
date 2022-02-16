@@ -30,5 +30,9 @@ router.delete("/deleteTask/:id", taskController.delete);
 
 router.get("/taskSuccess", analyticsController.getTaskSuccess);
 router.get("/categoryTime", analyticsController.getCategoryTime);
+router.get(
+  "/workingHoursBreakdown",
+  analyticsController.getWorkingHoursBreakdown
+);
 
 module.exports = router;

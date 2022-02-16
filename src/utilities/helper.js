@@ -12,12 +12,6 @@ module.exports = {
 
   successResponse: (req, res, data, meta = null) => {
     logger.info("sending success response");
-    console.log({
-      data,
-      error: null,
-      success: true,
-      meta: meta,
-    });
 
     return res.send({
       data,
@@ -29,16 +23,6 @@ module.exports = {
 
   errorResponse: (req, res, errorMessage = "Something went wrong", data) => {
     logger.error("sending error response");
-    console.log({
-      data: null,
-      error: {
-        errorCode: data.code || 500,
-        errorStatus: data.status || "Internal Server Error",
-        errorMessage,
-      },
-      success: false,
-      meta: null,
-    });
 
     res.status(data.code || 500).json({
       data: null,
@@ -80,9 +64,6 @@ module.exports = {
       });
     });
 
-    logger.info("from helper");
-    console.log(array1.map((a) => a[key1]));
-
     return array1.map((a) => a[key1]);
   },
 
@@ -103,8 +84,6 @@ module.exports = {
     let hours = 0;
     let minutes = 0;
     subtaskArr.map((subtask) => {
-      console.log(subtask.startTime, subtask.endTime);
-
       let startTime = subtask.startTime.split(":");
       let endTime = subtask.endTime.split(":");
 

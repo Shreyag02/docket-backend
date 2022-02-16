@@ -23,12 +23,19 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//pino logger
+// pino logger
 const loggerMidlleware = expressPinoLogger({
-  logger: logger,
+  logger,
   autoLogging: true,
 });
 
+// const loggerMidlleware = pino({
+//   logger: logger,
+//   autoLogging: true,
+//   prettyPrint: {
+//     levelFirst: true
+//   }
+// })
 app.use(loggerMidlleware);
 
 //ROUTES
