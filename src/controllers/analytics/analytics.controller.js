@@ -1,15 +1,14 @@
 const { Category, Task } = require("../../models");
-const { v4: uuidv4 } = require("uuid");
 
 const { successResponse, errorResponse } = require("../../utilities/helper");
 
 const logger = require("../../services/loggerService");
 
-const { categoryRegister } = require("../../utilities/validations/category");
 const {
   DataNotFoundError,
   DataDuplicateError,
 } = require("../../utilities/views/errorResponse");
+
 const { Op } = require("sequelize");
 
 module.exports = {
@@ -19,7 +18,11 @@ module.exports = {
     try {
       // const value = await taskSuccess
       let oauth = res.locals.oauth.token;
-      const { startDate, endDate } = req.body;
+      // const { startDate, endDate } = req.body;
+
+      let startDate = new Date(req.body.startDate);
+      let endDate = new Date(req.body.endDate);
+      endDate.setDate(endDate.getDate() + 1);
 
       // let todayStart = new Date().setHours(0, 0, 0, 0);
       // let current = new Date();
@@ -56,11 +59,15 @@ module.exports = {
           userId: oauth.user.id,
           archivedAt: null,
           createdAt: {
-            [Op.gte]: new Date(startDate),
-            [Op.lte]: new Date(endDate),
+            [Op.gte]: startDate,
+            [Op.lte]: endDate,
           },
           status: "pending",
         },
+      });
+      console.log({
+        startDate,
+        endDate,
       });
 
       const completedTasks = await Task.findAndCountAll({
@@ -68,21 +75,31 @@ module.exports = {
           userId: oauth.user.id,
           archivedAt: null,
           createdAt: {
-            [Op.gte]: new Date(startDate),
-            [Op.lte]: new Date(endDate),
+            [Op.gte]: startDate,
+            [Op.lte]: endDate,
           },
-          status: "pending",
+          status: "completed",
         },
       });
 
+      console.log({ pendingTasks, completedTasks });
+
+      let successPercentage;
+
+      if (pendingTasks.count + completedTasks.count === 0)
+        successPercentage = 0;
+      else
+        successPercentage = (
+          (completedTasks.count / (pendingTasks.count + completedTasks.count)) *
+          100
+        ).toFixed(2);
+
       const response = {
         userId: oauth.user.id,
-        totalTasks: pendingTasks + completedTasks,
-        pendingTasks,
-        completedTasks,
-        successPercentage: `${
-          (completedTasks / (pendingTasks + completedTasks)) * 100
-        }%`,
+        totalTasks: pendingTasks.count + completedTasks.count,
+        pendingTasks: pendingTasks.count,
+        completedTasks: completedTasks.count,
+        successPercentage: `${successPercentage}%`,
       };
 
       return successResponse(req, res, response);
