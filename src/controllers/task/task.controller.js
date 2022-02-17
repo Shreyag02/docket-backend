@@ -465,15 +465,9 @@ module.exports = {
             where: {
               archivedAt: null,
             },
-            attributes: {
-              exclude: [
-                "archivedAt",
-                "createdAt",
-                "updatedAt",
-                "userId",
-                "id",
-                "task_tags",
-              ],
+            attributes: ["name"],
+            through: {
+              attributes: [],
             },
           },
         ],
