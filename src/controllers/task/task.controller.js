@@ -283,7 +283,15 @@ module.exports = {
           userId: oauth.user.id,
           archivedAt: null,
         },
-        attributes: { exclude: ["archivedAt", "createdAt", "updatedAt"] },
+        attributes: {
+          exclude: [
+            "archivedAt",
+            "createdAt",
+            "updatedAt",
+            "userId",
+            "categoryId",
+          ],
+        },
       });
 
       const updatedTags = await Tag.findAll({
@@ -472,7 +480,13 @@ module.exports = {
           },
         ],
         attributes: {
-          exclude: ["archivedAt", "createdAt", "updatedAt"],
+          exclude: [
+            "archivedAt",
+            "createdAt",
+            "updatedAt",
+            "userId",
+            "categoryId",
+          ],
         },
       });
 
