@@ -74,7 +74,9 @@ module.exports = {
 
       const user = await User.findOne({
         where: { email, archivedAt: null },
-        exclude: ["archivedAt", "createdAt", "updatedAt"],
+        attributes: {
+          exclude: ["archivedAt", "createdAt", "updatedAt"],
+        },
       });
 
       if (!user) {
@@ -82,7 +84,7 @@ module.exports = {
       }
 
       let flag = await bcrypt
-        .compare(password, user.password)
+        .compare(password, user?.password)
         .then(async (result) => {
           return result;
         });

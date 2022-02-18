@@ -50,26 +50,33 @@ module.exports = {
         "any.required": `categoryName is a required field`,
       }),
 
-    description: Joi.string().required().messages({
-      "string.base": `description should be a type of string`,
-      "string.empty": `description must contain value`,
-      "string.pattern.base": `invalid description`,
-      "any.required": `description is a required field`,
-    }),
+    description: Joi.string()
+      .required()
+      .messages({
+        "string.base": `description should be a type of string`,
+        "string.empty": `description must contain value`,
+        "string.pattern.base": `invalid description`,
+        "any.required": `description is a required field`,
+      })
+      .allow(null, ""),
 
-    priority: Joi.string().valid("urgent", "medium", "low").required(),
+    priority: Joi.string()
+      .valid("urgent", "medium", "low")
+      .required()
+      .allow(null),
 
-    dueDate: Joi.date(),
+    dueDate: Joi.date().allow(null),
 
-    reminderDate: Joi.date(),
+    reminderDate: Joi.date().allow(null),
 
     repeat: Joi.string()
       .valid("daily", "monthly", "weekly", "yearly")
-      .required(),
+      .required()
+      .allow(null),
 
-    addToMyDay: Joi.date(),
+    addToMyDay: Joi.date().allow(null),
 
-    status: Joi.string().valid("pending", "completed").required(),
+    status: Joi.string().valid("pending", "completed").required().allow(null),
 
     tags: Joi.array().items(
       Joi.object({
@@ -82,7 +89,8 @@ module.exports = {
             "string.empty": `tagName must contain value`,
             "string.pattern.base": `invalid tag name`,
             "any.required": `tagName is a required field`,
-          }),
+          })
+          .allow(null, ""),
       })
     ),
 
@@ -97,17 +105,21 @@ module.exports = {
             "string.empty": `subtaskName must contain value`,
             "string.pattern.base": `invalid subtask name`,
             "any.required": `subtask name is a required field`,
-          }),
+          })
+          .allow(null, ""),
 
-        status: Joi.string().valid("pending", "completed").required(),
+        status: Joi.string()
+          .valid("pending", "completed")
+          .required()
+          .allow(null),
 
-        startTime: Joi.string().regex(
-          /^(2[0-3]|[01]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])$/
-        ),
+        startTime: Joi.string()
+          .regex(/^(2[0-3]|[01]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])$/)
+          .allow(null, ""),
 
-        endTime: Joi.string().regex(
-          /^(2[0-3]|[01]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])$/
-        ),
+        endTime: Joi.string()
+          .regex(/^(2[0-3]|[01]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])$/)
+          .allow(null, ""),
       })
     ),
   }),
